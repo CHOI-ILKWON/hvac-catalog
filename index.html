@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HVAC 장비 카탈로그 DB</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  background: #f0eeeb;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #999; border-radius: 3px; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #1a2035;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+}
+.sidebar-title {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 18px 16px 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.group-label {
+  color: #6b7a99;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 14px 16px 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #b0b8d0;
+  padding: 7px 16px 7px 24px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.menu-item:hover { background: rgba(255,255,255,0.08); }
+.menu-item.active { background: #c0392b; color: #fff; }
+
+/* ── Main ── */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Header ── */
+#page-header {
+  background: #1a2035;
+  border-bottom: 3px solid #c0392b;
+  padding: 13px 24px;
+  flex-shrink: 0;
+}
+#header-title { font-size: 15px; font-weight: 700; color: #fff; }
+#header-sub { font-size: 11px; color: #8899bb; margin-top: 3px; }
+
+/* ── Toolbar ── */
+#toolbar {
+  padding: 9px 24px;
+  background: #fff;
+  border-bottom: 1px solid #dcd9d3;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+#toolbar input[type=text],
+#toolbar input[type=number] {
+  border: 1px solid #c8c4bc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  background: #fafafa;
+  outline: none;
+}
+#toolbar input[type=text] { width: 180px; }
+#toolbar input[type=number] { width: 88px; }
+#toolbar input:focus { border-color: #c0392b; background: #fff; }
+#toolbar input:disabled { opacity: 0.35; background: #f0eeeb; }
+.lbl { font-size: 11px; color: #666; white-space: nowrap; }
+.sep { width: 1px; height: 22px; background: #dcd9d3; flex-shrink: 0; }
+
+/* ── Buttons ── */
+.btn {
+  border: none;
+  border-radius: 4px;
+  padding: 6px 13px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-red  { background: #c0392b; color: #fff; }
+.btn-red:hover  { background: #a93226; }
+.btn-dark { background: #2c3345; color: #e8eaf0; }
+.btn-dark:hover { background: #1a2035; }
+.btn-sm { padding: 3px 8px; font-size: 11px; border-radius: 3px; }
+.btn-edit { background: #2b7de9; color: #fff; }
+.btn-edit:hover { background: #1a5cac; }
+.btn-del  { background: #e03e3e; color: #fff; }
+.btn-del:hover  { background: #c53030; }
+
+/* ── Content ── */
+#content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 24px;
+}
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #aaa;
+  gap: 8px;
+}
+.no-data .icon { font-size: 40px; }
+.no-data .msg  { font-size: 14px; color: #888; }
+.no-data .sub  { font-size: 12px; color: #bbb; }
+.add-btn { margin-top: 12px; }
+
+.table-wrap { overflow-x: auto; }
+table {
+  border-collapse: collapse;
+  font-size: 12px;
+  background: #fff;
+  width: 100%;
+  min-width: max-content;
+}
+thead th {
+  background: #2c3345;
+  color: #e8eaf0;
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+  border: 1px solid #c8c4bc;
+  font-weight: 600;
+  font-size: 11px;
+  user-select: none;
+}
+thead th.sortable { cursor: pointer; }
+thead th.sortable:hover { background: #3a4560; }
+thead th.sort-asc  { background: #3d2b1a; color: #ffcc99; }
+thead th.sort-desc { background: #3d2b1a; color: #ffcc99; }
+.sort-icon { margin-left: 4px; font-size: 10px; opacity: 0.6; }
+thead th.sort-asc  .sort-icon,
+thead th.sort-desc .sort-icon { opacity: 1; }
+td {
+  padding: 6px 10px;
+  border: 1px solid #c8c4bc;
+  white-space: nowrap;
+  color: #333;
+}
+tbody tr:nth-child(even) td { background: #f4f3f0; }
+tbody tr:hover td { background: #edeae4 !important; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.ctr { text-align: center; }
+
+/* ── Selection Panel ── */
+#sel-panel {
+  background: #fff;
+  border-top: 2px solid #c0392b;
+  flex-shrink: 0;
+  max-height: 210px;
+  display: none;
+  flex-direction: column;
+}
+#sel-panel-hd {
+  padding: 7px 24px;
+  background: #fff9f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid #f0dada;
+}
+#sel-panel-hd h3 { font-size: 12px; color: #c0392b; font-weight: 700; }
+#sel-panel-bd { overflow: auto; padding: 8px 24px; flex: 1; }
+
+/* ── Modal ── */
+#modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+#modal-overlay.open { display: flex; }
+#modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 95vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+#modal-hd {
+  background: #1a2035;
+  color: #fff;
+  padding: 13px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#modal-hd h3 { font-size: 14px; }
+#modal-hd button {
+  background: none; border: none; color: #aaa;
+  font-size: 22px; cursor: pointer; line-height: 1; padding: 0 4px;
+}
+#modal-hd button:hover { color: #fff; }
+#modal-bd { overflow-y: auto; padding: 16px 18px; flex: 1; }
+#modal-ft {
+  padding: 11px 18px;
+  border-top: 1px solid #e8e8e8;
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.form-row { margin-bottom: 11px; }
+.form-row label {
+  display: block;
+  font-size: 11px; color: #555; font-weight: 600; margin-bottom: 4px;
+}
+.form-row input[type=text] {
+  width: 100%;
+  border: 1px solid #c8c4bc;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+.form-row input:focus { border-color: #c0392b; }
+.form-hint { font-size: 10px; color: #aaa; margin-top: 8px; }
+
+/* Mobile */
+#mob-toggle { display: none; }
+#mob-overlay { display: none; }
+@media (max-width: 640px) {
+  #sidebar {
+    position: fixed; left: -240px; top: 0;
+    height: 100vh; z-index: 100; transition: left 0.25s;
+  }
+  #sidebar.open { left: 0; }
+  #mob-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4); z-index: 99;
+  }
+  #mob-overlay.open { display: block; }
+  #mob-toggle {
+    display: flex; align-items: center;
+    gap: 6px; padding: 5px 10px;
+    border: 1px solid #c8c4bc; border-radius: 4px;
+    background: #fff; cursor: pointer;
+    font-size: 12px; font-family: inherit;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="mob-overlay" onclick="closeSb()"></div>
+
+<div id="sidebar">
+  <div class="sidebar-title">HVAC 장비 DB</div>
+</div>
+
+<div id="main">
+  <div id="page-header">
+    <div id="header-title">장비를 선택하세요</div>
+    <div id="header-sub"></div>
+  </div>
+
+  <div id="toolbar">
+    <button id="mob-toggle" onclick="toggleSb()">☰ 메뉴</button>
+    <input type="text"   id="srch"    placeholder="🔍 키워드 검색..." onchange="applyFilter()">
+    <span class="lbl" id="cap-lbl">냉방용량 ≥</span>
+    <input type="number" id="cap-min" placeholder="W" onchange="applyFilter()">
+    <div class="sep"></div>
+    <button class="btn btn-red"  onclick="openAdd()">+ 장비 추가</button>
+    <div class="sep"></div>
+    <button class="btn btn-dark" onclick="saveJSON()">💾 저장</button>
+    <label  class="btn btn-dark" style="cursor:pointer">
+      📂 불러오기<input type="file" accept=".json" style="display:none" onchange="loadJSON(event)">
+    </label>
+    <button class="btn btn-dark" onclick="exportSel()">📋 선정 내보내기</button>
+  </div>
+
+  <div id="content">
+    <div class="no-data">
+      <div class="icon">🏭</div>
+      <div class="msg">HVAC 장비 카탈로그 DB</div>
+      <div class="sub">사이드바에서 장비를 선택하세요</div>
+    </div>
+  </div>
+
+  <div id="sel-panel">
+    <div id="sel-panel-hd" onclick="toggleSelPanel()">
+      <h3>📋 선정 목록 <span id="sel-count"></span></h3>
+      <span id="sel-arrow">▲</span>
+    </div>
+    <div id="sel-panel-bd"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal-overlay" onclick="onOvClick(event)">
+  <div id="modal">
+    <div id="modal-hd">
+      <h3 id="modal-title">장비 추가</h3>
+      <button onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-bd"></div>
+    <div id="modal-ft">
+      <button class="btn btn-dark" onclick="closeModal()">취소</button>
+      <button class="btn btn-red"  onclick="saveModal()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DB
+// ════════════════════════════════════════
+const DB = {
+  CTH: {
+    name: "항온항습기 (CONSTANT TEMPERATURE & HUMIDITY UNIT)",
+    cols: ["냉방용량(W)","형식","실내기풍량(CMH)","정압(mmAq)","모터동력(kW)","냉방코일형식","난방코일형식","가스관(mm)","액관(mm)","냉매","동력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [8100,"AIR COOLED,FLOOR MOUNTED,SIROCCO",1620,0.20,2.21,"Scroll",3600,"0.06×2","R-407C",9.5,15.9,25,13.8,"3P×460V×60Hz",""],
+      [14500,"AIR COOLED,FLOOR MOUNTED,SIROCCO",2700,0.40,2.98,"Scroll",5400,"0.09×2","R-407C",12.7,19.1,25,18.4,"3P×460V×60Hz",""],
+      [21000,"AIR COOLED,FLOOR MOUNTED,SIROCCO",4080,0.75,5.04,"Scroll",9600,"0.21×2","R-407C",15.9,22.2,25,27.6,"3P×460V×60Hz",""],
+      [29000,"AIR COOLED,FLOOR MOUNTED,SIROCCO",5400,0.75,6.75,"Scroll",9600,"0.21×2","R-407C",15.9,25.4,25,36.4,"3P×460V×60Hz",""],
+    ]
+  },
+  PAC: {
+    name: "패키지 에어컨 (PACKAGED AIR CONDITIONER)",
+    cols: ["냉방용량(W)","형식","실내기풍량(CMH)","정압(mmAq)","모터동력(kW)","냉방코일형식","난방코일형식","가스관(mm)","액관(mm)","냉매","동력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [2500,null,"AIR COOLED,FLOOR MOUNTED",1200,0.045,1.57,"Scroll",2400,0,"R-407C",9.5,15.9,17,4.2,"1P×220V×60Hz","소용량"],
+      [7600,null,"AIR COOLED,FLOOR MOUNTED",1620,0.20,1.74,"Scroll",3600,"0.06×2","R-407C",9.5,15.9,17,10.7,"3P×460V×60Hz",""],
+      [11000,null,"AIR COOLED,FLOOR MOUNTED,SIROCCO",1620,0.197,0.21,"Scroll",5400,"1.4×2","R-407C",9.5,15.9,17,3.5,"1P×220V×60Hz","소용량"],
+      [12700,null,"AIR COOLED,FLOOR MOUNTED",2700,0.40,2.98,"Scroll",5400,"0.09×2","R-407C",12.7,19.1,null,15.4,"3P×460V×60Hz",""],
+      [14500,null,"AIR COOLED,FLOOR MOUNTED,SIROCCO",2100,0.22,0.21,"Scroll",5400,"1.5×2","R-407C",12.7,19.1,17,4.6,"3P×460V×60Hz",""],
+      [21000,null,"AIR COOLED,FLOOR MOUNTED,SIROCCO",3000,"0.105×2","0.21×2","Scroll",9600,5.04,"R-407C",15.9,22.2,null,7.7,"3P×460V×60Hz",""],
+      [30000,null,"AIR COOLED,FLOOR MOUNTED,SIROCCO",3600,"0.22×2",6.75,"Scroll",9600,"0.21×2","R-407C",15.9,22.2,null,10.9,"3P×460V×60Hz",""],
+    ]
+  },
+  SAC: {
+    name: "스플릿에어컨 (SPLIT AIR CONDITIONER)",
+    cols: ["냉방용량(W)","난방용량(W)","형식","풍량(CMH)","소비전력(kW)","냉매","액관(mm)","가스관(mm)","전원","비고"],
+    data: []
+  },
+  EHP: {
+    name: "냉난방 히트펌프 실내기 (EHP INDOOR UNIT)",
+    cols: ["냉방용량(W)","난방용량(W)","형식","풍량(CMH)","정압(Pa)","전동력(kW)","냉매","액관(mm)","가스관(mm)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [2000,2200,"장카셋 1WAY",492,0.01,"1×220×60",""],
+      [3200,3600,"장카셋 1WAY",600,0.02,"1×220×60",""],
+      [4000,4500,"장카셋 4WAY",600,0.03,"1×220×60",""],
+      [5200,5900,"장카셋 4WAY",540,0.03,"1×220×60",""],
+      [7200,8100,"장카셋 4WAY",1020,0.03,"1×220×60",""],
+      [8300,9300,"장카셋 4WAY",1140,0.04,"1×220×60",""],
+      [11000,12400,"장카셋 4WAY",1560,0.09,"1×220×60","R410A"],
+    ]
+  },
+  EHP_OUT: {
+    name: "냉난방 히트펌프 실외기 (EHP OUTDOOR UNIT)",
+    cols: ["냉방용량(W)","난방용량(W)","압축기형식","압축기모터(kW)","응축기풍량(CMH)","응축기팬모터(kW)","냉매","전원(Ph/V/Hz)"],
+    data: [
+      [4000,5000,"Twin Rotary",1.5,1680,0.043,"R410A","1/220/60"],
+      [23300,25900,"Inverter Scroll",5.3,14400,1.2,"R410A","3/460/60"],
+      [34800,39200,"Inverter Scroll",5.3,14400,1.2,"R410A","3/460/60"],
+    ]
+  },
+  DOAS: {
+    name: "외기전담공조기 (DEDICATED OUTDOOR AIR SYSTEM)",
+    cols: ["풍량(CMH)","냉방용량(kW)","난방용량(kW)","정압(Pa)","팬모터(kW)","냉매","전원","비고"],
+    data: []
+  },
+  AHU: {
+    name: "공조기 (AIR HANDLING UNIT)",
+    cols: ["풍량(CMH)","냉방용량(kW)","난방용량(kW)","정압(Pa)","팬모터(kW)","전원","비고"],
+    data: []
+  },
+  HEX: {
+    name: "전열교환기 (HEAT EXCHANGER / ERV)",
+    cols: ["풍량급기(CMH)","풍량배기(CMH)","정압(Pa)","팬모터급기(kW)","팬모터배기(kW)","전원(Ph/V/Hz)","필터","비고"],
+    data: [
+      [250,250,150,0.144,0.135,"1/220/60","NON-WOVEN"],
+      [500,500,150,0.144,0.135,"1/220/60","NON-WOVEN"],
+      [800,800,150,0.157,0.157,"1/220/60","NON-WOVEN"],
+      [1000,1000,150,0.157,0.157,"1/220/60","NON-WOVEN"],
+    ]
+  },
+  FAN_INLINE: {
+    name: "인라인 덕트팬 (DUCT IN-LINE FAN)",
+    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압(Pa)","모터동력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [300,"DIRECT or V-BELT",400,250,0.375,"3/460/60","전기기실 급기"],
+      [300,"DIRECT or V-BELT",400,250,0.375,"3/460/60","5층 항습 제어실 급기"],
+    ]
+  },
+  FAN_CEILING: {
+    name: "천정형 팬 (CEILING FAN)",
+    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압(Pa)","모터동력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [450,"DIRECT",2000,200,null,"3/380/60","천정형 급기"],
+      [450,"DIRECT",5100,200,null,"3/380/60","천정형 급기"],
+    ]
+  },
+  FAN_WALL: {
+    name: "벽부형 팬 (WALL FAN)",
+    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압(Pa)","모터동력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [400,"DIRECT",2200,30,0.093,"1/220/60","1층 순수 처리실 배기"],
+      [200,"DIRECT",600,160,0.07,"1/220/60","1층 화장실 배기"],
+      [380,"DIRECT or V-BELT",3300,150,0.75,"3/460/60","1층 기계실-2 배기"],
+      [200,"DIRECT",650,160,0.07,"1/220/60","1층 화장실 배기"],
+      [400,"DIRECT",2700,30,0.093,"1/220/60","1층 사무 광고 배기"],
+      [350,"DIRECT",1800,30,0.093,"1/220/60","2층 전기실-1 배기"],
+      [350,"DIRECT",1800,30,0.093,"1/220/60","3층 전기실-2 배기"],
+      [400,"DIRECT",2600,30,0.093,"1/220/60","4층 UPS & DC ROOM 배기"],
+      [300,"DIRECT",1500,30,0.065,"1/220/60","4층 전기실-3 배기"],
+      [250,"DIRECT",300,30,0.065,"1/220/60","4층 창고 배기"],
+      [200,"DIRECT",600,160,0.07,"1/220/60","5층 탕비실 & 휴게실 배기"],
+      [200,"DIRECT",600,160,0.07,"1/220/60","5층 화장실 배기"],
+      [300,"DIRECT",1500,30,0.065,"1/220/60","2층 문연형 사무실 배기"],
+      [300,"DIRECT",1000,30,0.065,"1/220/60","2층 공무형 사무실 배기"],
+      [300,"DIRECT",1400,30,0.065,"1/220/60","소방펌프동 소방펌프실 배기"],
+      [600,"DIRECT or V-BELT",6100,150,0.75,"3/460/60","바닥재 저장동 저장홀 배기"],
+    ]
+  },
+  FAN_ROOF: {
+    name: "루프팬 (ROOF FAN)",
+    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압(Pa)","모터동력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [900,"DIRECT or V-BELT",26000,150,2.24,"3/460/60","1~2층 증기터빈실 배기"],
+    ]
+  },
+  UNIT_HEATER: {
+    name: "유니트 히터 (UNIT HEATER)",
+    cols: ["용량(W)","용량(kg/h)","형식","팬풍량(CMH)","증기압력(kg/cm²)","팬동력(kW)","팬전원(Ph/V/Hz)","크기(mm)","동력*(kW)","전원*(Ph/V/Hz)","비고"],
+    data: [
+      [2800,"ELEC, WALL MOUNTED",700,0.065,"3/380/60",""],
+      [3100,"ELEC, WALL MOUNTED",700,0.065,"3/380/60","소방펌프실"],
+      [3300,"ELEC, WALL MOUNTED",700,0.065,"3/380/60",""],
+      [7500,"ELEC, WALL MOUNTED",1330,0.093,"3/380/60",""],
+      [9700,"ELEC, WALL MOUNTED",1330,0.093,"3/380/60",""],
+    ]
+  },
+  RADIATOR: {
+    name: "전기 라디에이터 (ELEC. RADIATOR)",
+    cols: ["용량(kW)","용량(kcal/h)","형식","크기(mm)","소비전력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [1500,1290,"ELEC","1/220/60",""],
+      [2000,1720,"ELEC","1/220/60",""],
+    ]
+  },
+  WATER_HEATER: {
+    name: "전기 급탕가열기 (ELEC. WATER HEATER)",
+    cols: ["저탕용량(L/h)","연관구경_급수(A)","연관구경_급탕(A)","연관구경_환탕(A)","형식","소비전력(kW)","전원(Ph/V/Hz)","비고"],
+    data: [
+      [15,1.5,15,15,"전기식 수직형 벽부형","1/220/60",""],
+      [30,2.5,15,15,"전기식 수직형 벽부형","1/220/60",""],
+      [200,2.0,15,15,"전기식 수직형 벽부형","1/220/60",""],
+      [300,3.0,40,40,"전기식 수직형","1/220/60",""],
+    ]
+  },
+  BOILER: {
+    name: "전기보일러 (ELEC. BOILER)",
+    cols: ["용량(kW)","용량(kcal/h)","형식","전원","비고"],
+    data: []
+  },
+  COOLING_TOWER: {
+    name: "냉각탑 (COOLING TOWER)",
+    cols: ["냉각용량(RT)","냉각수량(LPM)","팬동력(kW)","전원","외형치수","비고"],
+    data: []
+  },
+  WATER_TANK: {
+    name: "물탱크 (WATER STORAGE TANK)",
+    cols: ["용량(m³)","형식","재질","크기WxLxH(mm)","보온재","비고"],
+    data: [
+      [7.2,"SQUARE","STS304(S.M.C)","2000×2200×2500","",""],
+      [9,"SQUARE","STS304(S.M.C)","2000×2200×2500","",""],
+      [12,"SQUARE","STS304","2000×2000×3000","50t GLASS WOOL",""],
+    ]
+  },
+  PUMP: {
+    name: "급수펌프 / 부스터펌프 (WATER PUMP)",
+    cols: ["유량(L/min)","양정(M)","동력*(kW)","형식","전원(Ph/V/Hz)","제품초음파(%)","비고"],
+    data: [
+      [2.3,5,"0.2×2","IN-LINE","1/220/60",null,"급탕순환"],
+      [52,45,"0.75×2","PRESSURIZED(2PUMP)","3/460/60",null,"부스터 W/INVERTER"],
+      [200,20,1.5,"PRESSURIZED","3/380/60",null,"부스터"],
+    ]
+  },
+  EXPANSION_TANK: {
+    name: "팽창탱크 (EXPANSION TANK)",
+    cols: ["용량(L/min)","형식","크기WxHxD(mm)","MAX압력(kg/cm²)","MIN압력(kg/cm²)","접속구경(mm)"],
+    data: [
+      [12,"밀폐식 팽창탱크","280×360(H)×280",1.8,1.3,20],
+    ]
+  },
+  FIRE_PUMP_MOTOR: {
+    name: "소방펌프 모터구동 (FIRE PUMP-MOTOR)",
+    cols: ["유량(LPM)","양정(M)","전동력(kW)","형식","전원","비고"],
+    data: []
+  },
+  FIRE_PUMP_ENGINE: {
+    name: "소방펌프 엔진구동 (FIRE PUMP-ENGINE)",
+    cols: ["유량(LPM)","양정(M)","엔진출력(PS)","형식","전원","비고"],
+    data: []
+  },
+};
+
+const MENU = [
+  { group:"냉난방", items:[
+    {key:"CTH",     label:"CTH 항온항습기"},
+    {key:"PAC",     label:"PAC 패키지에어컨"},
+    {key:"SAC",     label:"SAC 스플릿에어컨"},
+    {key:"EHP",     label:"EHP 실내기"},
+    {key:"EHP_OUT", label:"EHP 실외기"},
+    {key:"DOAS",    label:"DOAS 외기전담공조"},
+    {key:"AHU",     label:"공조기 (AHU)"},
+  ]},
+  { group:"환기", items:[
+    {key:"HEX",        label:"전열교환기"},
+    {key:"FAN_INLINE",  label:"인라인덕트팬"},
+    {key:"FAN_CEILING", label:"천정형팬"},
+    {key:"FAN_WALL",    label:"벽부형팬"},
+    {key:"FAN_ROOF",    label:"루프팬"},
+  ]},
+  { group:"난방", items:[
+    {key:"UNIT_HEATER", label:"유니트히터"},
+    {key:"RADIATOR",    label:"라디에이터"},
+  ]},
+  { group:"위생/기계", items:[
+    {key:"WATER_HEATER",  label:"전기온수기"},
+    {key:"BOILER",        label:"전기보일러"},
+    {key:"COOLING_TOWER", label:"냉각탑"},
+    {key:"WATER_TANK",    label:"물탱크"},
+    {key:"PUMP",          label:"급수펌프"},
+    {key:"EXPANSION_TANK",label:"팽창탱크"},
+  ]},
+  { group:"소방", items:[
+    {key:"FIRE_PUMP_MOTOR",  label:"소방펌프(모터)"},
+    {key:"FIRE_PUMP_ENGINE", label:"소방펌프(엔진)"},
+  ]},
+];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let curKey = null;
+let editIdx = null;
+let selections = {};      // { key: Set<number> }
+let selPanelOpen = true;
+let sortCol = null;       // column index (number) or null
+let sortDir = 1;          // 1 = ASC, -1 = DESC
+
+// ════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════
+(function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  MENU.forEach(g => {
+    const gl = document.createElement('div');
+    gl.className = 'group-label';
+    gl.textContent = g.group;
+    sb.appendChild(gl);
+    g.items.forEach(item => {
+      const b = document.createElement('button');
+      b.className = 'menu-item';
+      b.textContent = item.label;
+      b.dataset.key = item.key;
+      b.onclick = () => { selectKey(item.key); closeSb(); };
+      sb.appendChild(b);
+    });
+  });
+})();
+
+function selectKey(key) {
+  curKey = key;
+  sortCol = null; sortDir = 1;
+  document.querySelectorAll('.menu-item').forEach(b =>
+    b.classList.toggle('active', b.dataset.key === key)
+  );
+  document.getElementById('srch').value = '';
+  document.getElementById('cap-min').value = '';
+  render();
+}
+
+function clickSort(colIdx) {
+  if (sortCol === colIdx) sortDir *= -1;
+  else { sortCol = colIdx; sortDir = 1; }
+  render();
+}
+
+function toggleSb() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mob-overlay').classList.toggle('open');
+}
+function closeSb() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mob-overlay').classList.remove('open');
+}
+
+// ════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════
+function render() {
+  if (!curKey) return;
+  const eq = DB[curKey];
+  document.getElementById('header-title').textContent = eq.name;
+
+  const hasCap = eq.cols.includes('냉방용량(W)');
+  document.getElementById('cap-lbl').style.opacity = hasCap ? '1' : '0.3';
+  document.getElementById('cap-min').disabled = !hasCap;
+
+  const rows = getFiltered();
+  document.getElementById('header-sub').textContent =
+    `총 ${eq.data.length}개 항목` +
+    (rows.length < eq.data.length ? ` (필터 결과: ${rows.length}개)` : '');
+
+  const content = document.getElementById('content');
+
+  if (eq.data.length === 0) {
+    content.innerHTML =
+      `<div class="no-data">
+        <div class="icon">📋</div>
+        <div class="msg">카탈로그 추가 예정</div>
+        <div class="sub">장비 추가 버튼으로 데이터를 입력하세요.</div>
+      </div>
+      <button class="btn btn-red add-btn" onclick="openAdd()">+ 장비 추가</button>`;
+    return;
+  }
+
+  const selSet = selections[curKey] || new Set();
+  const cols = eq.cols;
+
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th class="ctr" style="width:36px">#</th>
+    <th class="ctr" style="width:40px">선정</th>`;
+  cols.forEach((c, i) => {
+    const isSortCol = sortCol === i;
+    const cls = ['sortable', isSortCol ? (sortDir === 1 ? 'sort-asc' : 'sort-desc') : ''].join(' ');
+    const icon = isSortCol ? (sortDir === 1 ? '▲' : '▼') : '⇅';
+    html += `<th class="${cls}" onclick="clickSort(${i})">${esc(c)}<span class="sort-icon">${icon}</span></th>`;
+  });
+  html += `<th class="ctr" style="width:90px">액션</th></tr></thead><tbody>`;
+
+  if (rows.length === 0) {
+    html += `<tr><td colspan="${cols.length + 3}" style="text-align:center;padding:28px;color:#aaa">
+      검색 결과가 없습니다.
+    </td></tr>`;
+  } else {
+    rows.forEach(({ row, idx }) => {
+      const chk = selSet.has(idx) ? 'checked' : '';
+      html += `<tr>
+        <td class="ctr" style="color:#bbb;font-size:11px">${idx + 1}</td>
+        <td class="ctr"><input type="checkbox" ${chk} onchange="toggleSel(${idx},this.checked)"></td>`;
+      row.forEach(cell => {
+        if (cell === null || cell === undefined || cell === '') {
+          html += `<td><span style="color:#ccc">—</span></td>`;
+        } else if (typeof cell === 'number') {
+          html += `<td class="num">${cell.toLocaleString('ko-KR')}</td>`;
+        } else {
+          html += `<td>${esc(String(cell))}</td>`;
+        }
+      });
+      html += `<td class="ctr">
+        <button class="btn btn-sm btn-edit" onclick="openEdit(${idx})">수정</button>
+        <button class="btn btn-sm btn-del"  onclick="delRow(${idx})">삭제</button>
+      </td></tr>`;
+    });
+  }
+
+  html += `</tbody></table></div>
+    <button class="btn btn-red add-btn" onclick="openAdd()">+ 장비 추가</button>`;
+  content.innerHTML = html;
+  renderSelPanel();
+}
+
+// ════════════════════════════════════════
+// FILTER
+// ════════════════════════════════════════
+function getFiltered() {
+  const eq = DB[curKey];
+  const kw = document.getElementById('srch').value.trim().toLowerCase();
+  const capMin = parseFloat(document.getElementById('cap-min').value) || null;
+  const capIdx = eq.cols.indexOf('냉방용량(W)');
+
+  let result = eq.data.map((row, idx) => ({ row, idx })).filter(({ row }) => {
+    if (kw) {
+      const hit = row.some(c => c !== null && c !== undefined && String(c).toLowerCase().includes(kw));
+      if (!hit) return false;
+    }
+    if (capMin !== null && capIdx >= 0) {
+      const v = row[capIdx];
+      if (typeof v !== 'number' || v < capMin) return false;
+    }
+    return true;
+  });
+
+  if (sortCol !== null) {
+    result.sort((a, b) => {
+      const av = a.row[sortCol], bv = b.row[sortCol];
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir;
+      return String(av).localeCompare(String(bv), 'ko') * sortDir;
+    });
+  }
+  return result;
+}
+
+function applyFilter() {
+  if (curKey) render();
+}
+
+// ════════════════════════════════════════
+// CRUD
+// ════════════════════════════════════════
+function openAdd() {
+  editIdx = null;
+  document.getElementById('modal-title').textContent = '장비 추가';
+  buildForm(null);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function openEdit(idx) {
+  editIdx = idx;
+  document.getElementById('modal-title').textContent = '장비 수정';
+  buildForm(DB[curKey].data[idx]);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function buildForm(rowData) {
+  const cols = DB[curKey].cols;
+  let html = cols.map((col, i) => {
+    const v = rowData ? (rowData[i] != null ? rowData[i] : '') : '';
+    return `<div class="form-row">
+      <label>${esc(col)}</label>
+      <input type="text" data-i="${i}" value="${esc(String(v))}" placeholder="${esc(col)}">
+    </div>`;
+  }).join('');
+  html += `<p class="form-hint">※ 숫자만 입력 시 수치로 자동 인식 &nbsp;|&nbsp; 빈 칸 또는 "—" 입력 시 null 처리</p>`;
+  document.getElementById('modal-bd').innerHTML = html;
+}
+
+function saveModal() {
+  const inputs = document.querySelectorAll('#modal-bd input[data-i]');
+  const row = [];
+  inputs.forEach(inp => {
+    const v = inp.value.trim();
+    if (v === '' || v === '—') { row.push(null); return; }
+    const n = Number(v);
+    row.push(!isNaN(n) ? n : v);
+  });
+  const eq = DB[curKey];
+  if (editIdx !== null) {
+    eq.data[editIdx] = row;
+  } else {
+    eq.data.push(row);
+  }
+  closeModal();
+  render();
+}
+
+function delRow(idx) {
+  if (!confirm('이 항목을 삭제하시겠습니까?')) return;
+  DB[curKey].data.splice(idx, 1);
+  if (selections[curKey]) {
+    const ns = new Set();
+    selections[curKey].forEach(i => {
+      if (i < idx) ns.add(i);
+      else if (i > idx) ns.add(i - 1);
+    });
+    selections[curKey] = ns;
+  }
+  render();
+}
+
+// ════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+function onOvClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ════════════════════════════════════════
+// SELECTION
+// ════════════════════════════════════════
+function toggleSel(idx, checked) {
+  if (!selections[curKey]) selections[curKey] = new Set();
+  if (checked) selections[curKey].add(idx);
+  else         selections[curKey].delete(idx);
+  renderSelPanel();
+}
+
+function renderSelPanel() {
+  const panel  = document.getElementById('sel-panel');
+  const body   = document.getElementById('sel-panel-bd');
+  const countEl = document.getElementById('sel-count');
+
+  let total = 0;
+  Object.values(selections).forEach(s => { total += (s ? s.size : 0); });
+
+  if (total === 0) { panel.style.display = 'none'; return; }
+  panel.style.display = 'flex';
+  countEl.textContent = `(${total}개)`;
+
+  if (!selPanelOpen) { body.innerHTML = ''; return; }
+
+  let html = '';
+  Object.entries(selections).forEach(([key, idxSet]) => {
+    if (!idxSet || idxSet.size === 0) return;
+    const eq = DB[key];
+    html += `<div style="font-size:11px;font-weight:700;color:#c0392b;margin:6px 0 4px">${esc(eq.name)}</div>`;
+    html += `<div class="table-wrap"><table><thead><tr>`;
+    eq.cols.forEach(c => { html += `<th>${esc(c)}</th>`; });
+    html += `</tr></thead><tbody>`;
+    [...idxSet].sort((a,b)=>a-b).forEach(i => {
+      const row = eq.data[i];
+      if (!row) return;
+      html += '<tr>';
+      row.forEach(cell => {
+        if (cell === null || cell === undefined || cell === '') {
+          html += `<td><span style="color:#ccc">—</span></td>`;
+        } else if (typeof cell === 'number') {
+          html += `<td class="num">${cell.toLocaleString('ko-KR')}</td>`;
+        } else {
+          html += `<td>${esc(String(cell))}</td>`;
+        }
+      });
+      html += '</tr>';
+    });
+    html += `</tbody></table></div>`;
+  });
+  body.innerHTML = html;
+}
+
+function toggleSelPanel() {
+  selPanelOpen = !selPanelOpen;
+  document.getElementById('sel-arrow').textContent = selPanelOpen ? '▲' : '▼';
+  renderSelPanel();
+}
+
+// ════════════════════════════════════════
+// SAVE / LOAD / EXPORT
+// ════════════════════════════════════════
+function saveJSON() {
+  const selObj = {};
+  Object.entries(selections).forEach(([k,v]) => { if (v && v.size) selObj[k] = [...v]; });
+  const snapshot = {};
+  Object.keys(DB).forEach(k => { snapshot[k] = { name: DB[k].name, cols: DB[k].cols, data: DB[k].data }; });
+  const blob = new Blob([JSON.stringify({ DB: snapshot, selections: selObj }, null, 2)], { type:'application/json' });
+  triggerDownload(blob, 'hvac-catalog.json');
+}
+
+function loadJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const p = JSON.parse(ev.target.result);
+      if (p.DB) {
+        Object.keys(p.DB).forEach(k => {
+          if (DB[k] && Array.isArray(p.DB[k].data)) DB[k].data = p.DB[k].data;
+        });
+      }
+      if (p.selections) {
+        Object.keys(p.selections).forEach(k => {
+          selections[k] = new Set(p.selections[k]);
+        });
+      }
+      if (curKey) render(); else renderSelPanel();
+      alert('불러오기 완료!');
+    } catch {
+      alert('올바른 JSON 파일이 아닙니다.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function exportSel() {
+  const out = {};
+  Object.entries(selections).forEach(([key, idxSet]) => {
+    if (!idxSet || idxSet.size === 0) return;
+    const eq = DB[key];
+    out[key] = {
+      name: eq.name, cols: eq.cols,
+      data: [...idxSet].sort((a,b)=>a-b).map(i => eq.data[i]).filter(Boolean),
+    };
+  });
+  if (!Object.keys(out).length) { alert('선정된 장비가 없습니다.'); return; }
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+  triggerDownload(blob, 'hvac-selection.json');
+}
+
+function triggerDownload(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
