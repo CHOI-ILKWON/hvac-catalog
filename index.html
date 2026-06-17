@@ -180,6 +180,7 @@ thead th.sort-desc { background: #3d2b1a; color: #ffcc99; }
 .sort-icon { margin-left: 4px; font-size: 10px; opacity: 0.6; }
 thead th.sort-asc  .sort-icon,
 thead th.sort-desc .sort-icon { opacity: 1; }
+.sort-icon sup { font-size: 8px; vertical-align: super; line-height: 0; }
 td {
   padding: 6px 10px;
   border: 1px solid #c8c4bc;
@@ -190,6 +191,18 @@ tbody tr:nth-child(even) td { background: #f4f3f0; }
 tbody tr:hover td { background: #edeae4 !important; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.ctr { text-align: center; }
+
+/* ── 2단 헤더 ── */
+thead th.grp {
+  background: #1a2744;
+  text-align: center;
+  border-bottom: 1px solid #3a4a6a;
+}
+thead th.grp-leaf {
+  background: #2c3345;
+}
+thead th.grp-leaf.sort-asc,
+thead th.grp-leaf.sort-desc { background: #3d2b1a; color: #ffcc99; }
 
 /* ── Selection Panel ── */
 #sel-panel {
@@ -368,26 +381,37 @@ const DB = {
   CTH: {
     name: "항온항습기 실내기 (CONSTANT TEMPERATURE & HUMIDITY UNIT)",
     cols: [
-      "형식",
-      "팬&모터_형식","팬&모터_풍량(CMH)","팬&모터_정압(mmAq)","팬&모터_모터동력(kW)",
-      "냉방코일_형식","냉방코일_용량(W)",
-      "난방코일_형식","난방코일_용량(W)",
-      "가습기_형식","가습기_용량(kg/h)",
-      "냉매",
-      "연결관경_가스관(mm)","연결관경_액관(mm)",
-      "동력*(kW)","전원(Ph/V/Hz)","비고"
+      { label: "형식" },
+      { label: "팬&모터", children: ["형식", "풍량(CMH)", "정압(mmAq)", "모터(kW)"] },
+      { label: "냉방코일", children: ["형식", "용량(W)"] },
+      { label: "난방코일", children: ["형식", "용량(W)"] },
+      { label: "가습기", children: ["형식", "용량(kg/h)"] },
+      { label: "냉매" },
+      { label: "연결관경(Ø mm)", children: ["가스관", "액관"] },
+      { label: "동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"D.X",26900,"D.X",17000,"ELEC.",null,"R-410A",25.4,15.9,41.01,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"D.X",23500,"D.X",6500,"ELEC.",null,"R-410A",25.4,15.9,41.01,"3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.20,"D.X",14500,"D.X",15000,"ELEC.","4.0/3.0","R-410A",19.1,12.7,20.11,"3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.20,"D.X",14500,"D.X",15000,"ELEC.","4.0/3.0","R-410A",19.1,12.7,20.11,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.20,"D.X",14500,"D.X",15000,"ELEC.","4.0/3.0","R-410A",19.1,12.7,20.11,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"D.X",14500,"D.X",15000,"ELEC.",null,"R-407C",19.1,12.7,18.4,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"D.X",8100,"D.X",null,"ELEC.",null,"R-407C",15.9,9.5,13.8,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,"-",1.5,"D.X",24900,"ELEC.",3700,"ELEC.",8.0,"R-22",22.2,19.1,47.7,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,"-",2.2,"D.X",10800,"ELEC.",1300,"ELEC.",null,"R-22",22.2,19.1,64.0,"3/460/60",""],
       ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"D.X",2500,"D.X",null,"ELEC.",null,"R-22",15.9,9.5,18.4,"3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",4080,8,0.75,"CROSS FIN COIL",21000,"ELEC.",null,"ELEC.",4,"R-22",22.2,15.9,null,"3/220·380·440/60","범양 SVU 80R / PVU 80M"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,11,0.75,"CROSS FIN COIL",29000,"ELEC.",null,"ELEC.",4,"R-22",22.2,15.9,null,"3/220·380·440/60","범양 SVU 100R / PVU 100M"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,0,1.5,"CROSS FIN COIL",41280,"ELEC.",null,"ELEC.",8,"R-22",25.4,19.1,null,"3/220·380·440/60","범양 SVU 150RP / PVU 150JP"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,15,2.2,"CROSS FIN COIL",41280,"ELEC.",null,"ELEC.",8,"R-22",25.4,19.1,null,"3/220·380·440/60","범양 SVU 150RD / PVU 150JD"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",10800,0,2.2,"CROSS FIN COIL",58140,"ELEC.",null,"ELEC.",11,"R-22",25.4,19.1,null,"3/220·380·440/60","범양 SVU 200RP / PVU 200JP"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",10800,10,3.75,"CROSS FIN COIL",58140,"ELEC.",null,"ELEC.",11,"R-22",25.4,19.1,null,"3/220·380·440/60","범양 SVU 200RD / PVU 200JD"],
+      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,0,0.2,"CROSS FIN COIL",10000,"ELEC.",null,"ELEC.",2.4,"R-22",null,null,2.21,"3/220·380·440/60","범양 UCU 30M4"],
+      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,0,0.2,"CROSS FIN COIL",10000,"ELEC.",null,"ELEC.",2.4,"R-22",null,null,2.21,"3/220·380·440/60","범양 UCU 30M7.8"],
+      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,8,0.4,"CROSS FIN COIL",16000,"ELEC.",null,"ELEC.",3.6,"R-22",null,null,2.98,"3/220·380·440/60","범양 UCU 50M"],
+      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",4080,8,0.75,"CROSS FIN COIL",26000,"ELEC.",null,"ELEC.",4.8,"R-22",null,null,5.04,"3/220·380·440/60","범양 UCU 80M"],
+      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,11,0.75,"CROSS FIN COIL",32000,"ELEC.",null,"ELEC.",7.2,"R-22",null,null,5.96,"3/220·380·440/60","범양 UCU 100M"],
     ]
   },
 
@@ -395,15 +419,23 @@ const DB = {
   CTH_OUT: {
     name: "항온항습기 실외기 (CTH OUTDOOR UNIT)",
     cols: [
-      "냉방용량(W)","난방용량(W)",
-      "압축기_형식","압축기_모터(kW)",
-      "응축기_형식","응축기_풍량(CMH)","응축기_모터(kW)",
-      "냉매","동력*(kW)","전원(Ph/V/Hz)","비고"
+      { label: "냉방용량(W)" },
+      { label: "난방용량(W)" },
+      { label: "압축기", children: ["형식", "모터(kW)"] },
+      { label: "응축기", children: ["형식", "팬용량(CMH)", "모터(kW)"] },
+      { label: "냉매" },
+      { label: "동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
-      ["26900","17000","SCROLL",6.75,"프로펠러",9600,"0.21×2","R-410A",41.01,"3/460/60",""],
-      ["23500","6500","SCROLL",6.75,"프로펠러",9600,"0.21×2","R-410A",41.01,"3/460/60",""],
-      ["14500",null,"SCROLL",2.98,"프로펠러",5400,"0.09×2","R-410A",20.11,"3/460/60",""],
+      [26900,17000,"SCROLL",6.75,"프로펠러",9600,"0.21×2","R-410A",41.01,"3/460/60",""],
+      [23500,6500,"SCROLL",6.75,"프로펠러",9600,"0.21×2","R-410A",41.01,"3/460/60",""],
+      [14500,null,"SCROLL",2.98,"프로펠러",5400,"0.09×2","R-410A",20.11,"3/460/60",""],
+      [21000,null,"SCROLL",5.04,"PROPELLER",9600,0.42,"R-22",null,"3/220·380·440/60","범양 RSU 80R"],
+      [29000,null,"SCROLL",6.75,"PROPELLER",9600,0.42,"R-22",null,"3/220·380·440/60","범양 RSU 100R"],
+      [41280,null,"SCROLL×2",10.08,"PROPELLER",14400,0.84,"R-22",null,"3/220·380·440/60","범양 RSU 80R×2"],
+      [58140,null,"SCROLL×2",13.5,"PROPELLER",19200,0.84,"R-22",null,"3/220·380·440/60","범양 RSU 100R×2"],
     ]
   },
 
@@ -411,30 +443,35 @@ const DB = {
   PAC: {
     name: "패키지 에어컨 (PACKAGED AIR CONDITIONER)",
     cols: [
-      "형식",
-      "팬&모터_형식","팬&모터_풍량(CMH)","팬&모터_정압(mmAq)","팬&모터_모터동력(kW)",
-      "냉방코일_형식","냉방코일_용량(W)",
-      "난방코일_형식","난방코일_용량(W)",
-      "가습기_용량(kg/kW)",
-      "압축기_컴프레서수","압축기_모터(kW)","압축기_형식",
-      "냉매",
-      "연결관경_가스관(mm)","연결관경_액관(mm)",
-      "동력*(kW)","전원_실내기(Ph/V/Hz)","전원_실외기(Ph/V/Hz)","비고"
+      { label: "형식" },
+      { label: "팬&모터", children: ["형식", "풍량(CMH)", "정압(mmAq)", "모터(kW)"] },
+      { label: "냉방코일", children: ["형식", "용량(W)"] },
+      { label: "난방코일", children: ["형식", "용량(W)"] },
+      { label: "가습기 용량(kg/h)" },
+      { label: "압축기", children: ["팬모터", "모터(kW)", "형식"] },
+      { label: "냉매" },
+      { label: "연결관경(Ø mm)", children: ["가스관", "액관"] },
+      { label: "동력*(kW)" },
+      { label: "전원", children: ["실내기(Ph/V/Hz)", "실외기(Ph/V/Hz)"] },
+      { label: "비고" },
     ],
     data: [
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"ELEC.",27200,"ELEC.",null,null,"0.21×2",6.75,"Scroll","R-410A",22.2,15.9,25.4,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"ELEC.",7900,"ELEC.",null,null,"0.06×2",1.74,"Scroll","R-410A",15.9,9.5,15.9,"3/460/60","3/1/10.7",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",9000,null,null,null,"0.09×2",2.98,"Scroll","R-410A",19.1,12.7,19.1,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"ELEC.",29000,null,null,null,"0.21×2",6.75,"Scroll","R-410A",22.2,15.9,25.4,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",14500,null,null,null,"0.09×2",2.98,"Scroll","R-410A",19.1,12.7,19.1,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",14500,null,null,null,"0.09×2",2.98,"Scroll","R-410A",19.1,12.7,5.0,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"ELEC.",8100,null,null,null,"0.06×2",1.74,"Scroll","R-410A",15.9,9.5,15.9,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",12700,null,null,null,"0.09×2",2.98,"Scroll","R-407C",19.1,12.7,15.4,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"ELEC.",7600,null,null,null,"0.06×2",1.74,"Scroll","R-407C",15.9,9.5,10.7,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED","SIROCCO",1200,"-",0.045,"ELEC.",2500,null,null,null,0,1.57,"Scroll","R-407C",15.9,9.5,4.2,"1/220/60","1/220/60","소용량"],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",3100,"-",0.19,"D.X",11600,"ELEC.",13700,null,"0.31×2",5.04,"Scroll","R-22",12.7,9.5,16.0,"3/460/60","3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1200,"-",0.045,"D.X",1800,"ELEC.",null,null,"0.06×2",1.57,"Scroll","R-410A",9.5,9.5,8.0,"3/460/60","3/460/60",""],
-      ["AIR COOLED,WALL MOUNTED,SIROCCO","SIROCCO",600,"-",0.02,"D.X",600,"HEAT PUMP",null,null,0.035,0.7,"Scroll","R-410A",9.5,9.5,4.2,"1/220/60","1/220/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"ELEC.",27200,"ELEC.",null,null,"0.21×2",6.75,"Scroll","R-410A",22.2,15.9,8.0,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"ELEC.",7900,"ELEC.",null,null,"0.06×2",1.74,"Scroll","R-410A",15.9,9.5,2.1,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",9000,null,null,null,"0.09×2",2.98,"Scroll","R-410A",19.1,12.7,3.6,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"ELEC.",29000,null,null,null,"0.21×2",6.75,"Scroll","R-410A",22.2,15.9,8.0,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",14500,null,null,null,"0.09×2",2.98,"Scroll","R-410A",19.1,12.7,3.6,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"ELEC.",8100,null,null,null,"0.06×2",1.74,"Scroll","R-410A",15.9,9.5,2.1,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"ELEC.",12700,null,null,null,"0.09×2",2.98,"Scroll","R-407C",19.1,12.7,3.6,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"ELEC.",7600,null,null,null,"0.06×2",1.74,"Scroll","R-407C",15.9,9.5,2.1,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED","SIROCCO",1200,"-",0.045,"ELEC.",2500,null,null,null,0,1.57,"Scroll","R-407C",15.9,9.5,1.6,"1/220/60","1/220/60","소용량"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",3100,"-",0.19,"D.X",11600,"ELEC.",13700,null,"0.31×2",5.04,"Scroll","R-22",12.7,9.5,5.9,"3/460/60","3/460/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1200,"-",0.045,"D.X",1800,"ELEC.",null,null,"0.06×2",1.57,"Scroll","R-410A",9.5,9.5,1.7,"3/460/60","3/460/60",""],
+      ["AIR COOLED,WALL MOUNTED,SIROCCO","SIROCCO",600,"-",0.02,"D.X",600,"HEAT PUMP",null,null,0.035,0.7,"Scroll","R-410A",9.5,9.5,0.8,"1/220/60","1/220/60",""],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,8,0.21,"CROSS FIN COIL",10000,null,null,null,"0.21×2",2.8,"Scroll","R-22",16.88,9.52,3.2,"3/220/60","3/220·380/60","범양 KPC-30R"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2100,0,0.22,"CROSS FIN COIL",14500,null,null,null,"0.21×2",3.0,"Scroll","R-22",16.88,9.52,3.4,"3/220/60","3/380/60","범양 KPC-42R"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",3000,8,0.13,"CROSS FIN COIL",21000,null,null,null,"0.21×2",5.04,"Scroll","R-22",22.2,15.9,5.4,"3/220/60","3/380/60","범양 KPC-580R"],
+      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",3600,0,0.42,"CROSS FIN COIL",30000,null,null,null,"0.21×4",6.75,"Scroll","R-22",25.4,19.1,7.6,"3/220/60","3/380·440/60","범양 KPC-650R"],
     ]
   },
 
@@ -442,13 +479,17 @@ const DB = {
   SAC: {
     name: "스플릿 에어컨 (SPLIT AIR CONDITIONER)",
     cols: [
-      "냉방용량(W)","형식(실내기)",
-      "풍량(CMH)","정압(Pa)","소비전력(kW)",
-      "냉매","연결관경_가스관(mm)","연결관경_액관(mm)",
-      "전원_실내기(Ph/V/Hz)","전원_실외기(Ph/V/Hz)","비고"
+      { label: "냉방용량(W)" },
+      { label: "형식(실내기)" },
+      { label: "풍량(CMH)" },
+      { label: "정압(Pa)" },
+      { label: "소비전력(kW)" },
+      { label: "냉매" },
+      { label: "연결관경(Ø mm)", children: ["가스관", "액관"] },
+      { label: "전원", children: ["실내기(Ph/V/Hz)", "실외기(Ph/V/Hz)"] },
+      { label: "비고" },
     ],
     data: [
-      [7100,"4-WAY CEILING CASSETTE",null,null,0.20,"R-410A",null,null,"1/230/60","3/400/60",""],
       [7100,"4-WAY CEILING CASSETTE",null,null,0.20,"R-410A",null,null,"1/230/60","3/400/60",""],
       [20000,"FLOOR MOUNTED (STAND)",null,null,0.20,"R-410A",null,null,"1/230/60","3/400/60",""],
       [3000,"WALL MOUNTED",null,null,0.20,"R-410A",null,null,"1/230/60","3/400/60",""],
@@ -471,10 +512,15 @@ const DB = {
   EHP: {
     name: "냉난방 히트펌프 실내기 (EHP INDOOR UNIT)",
     cols: [
-      "냉방용량(W)","난방용량(W)","형식",
-      "풍량(CMH)","냉매",
-      "연결관경_가스관(mm)","연결관경_액관(mm)",
-      "전체동력*(kW)","전원(Ph/V/Hz)","비고"
+      { label: "냉방용량(W)" },
+      { label: "난방용량(W)" },
+      { label: "형식" },
+      { label: "풍량(CMH)" },
+      { label: "냉매" },
+      { label: "연결관경(Ø mm)", children: ["가스관", "액관"] },
+      { label: "전체동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
       [11000,12400,"4-WAY 천장 카세트형",1620,"R-410A",15.88,9.52,0.09,"1/220/60",""],
@@ -483,14 +529,28 @@ const DB = {
       [5200,5900,"4-WAY 천장 카세트형",1020,"R-410A",15.88,9.52,0.04,"1/220/60",""],
       [5200,5900,"4-WAY 천장 카세트형",840,"R-410A",15.88,9.52,0.03,"1/220/60",""],
       [6000,6800,"4-WAY 천장 카세트형",1080,"R-410A",15.88,9.52,0.05,"1/220/60",""],
-      [7200,8100,"4-WAY 천장 카세트형",1320,"R-410A",15.88,9.52,0.055,"1/220/60",""],
-      [6000,6800,"4-WAY 천장 카세트형",1080,"R-410A",15.88,9.52,0.05,"1/220/60",""],
-      [5200,5900,"4-WAY 천장 카세트형",1020,"R-410A",15.88,9.52,0.04,"1/220/60",""],
       [2300,2600,"1-WAY 천장 카세트형",492,"R-410A",12.7,6.35,0.01,"1/220/60",""],
-      [5200,5900,"4-WAY 천장 카세트형",1020,"R-410A",15.88,9.52,0.04,"1/220/60",""],
       [4000,5000,"1-WAY 천장 카세트형",480,"R-410A",15.88,9.52,0.06,"1/220/60",""],
       [11000,12400,"4-WAY 천장 카세트형",1560,"R-410A",15.88,9.52,0.09,"1/220/60",""],
       [2300,2500,"1-WAY 천장 카세트형",420,"R-410A",12.7,6.35,0.078,"1/220/60",""],
+      [5600,6300,"4WAY 천장 카세트형",1200,"R-410A",15.88,9.52,0.04,"1/220/60","삼성 DVM S 5.6kW"],
+      [8000,9000,"4WAY 천장 카세트형",1620,"R-410A",15.88,9.52,0.055,"1/220/60","삼성 DVM S 8kW"],
+      [10000,11200,"4WAY 천장 카세트형",2100,"R-410A",15.88,9.52,0.075,"1/220/60","삼성 DVM S 10kW"],
+      [14000,16000,"4WAY 천장 카세트형",2700,"R-410A",22.2,9.52,0.1,"1/220/60","삼성 DVM S 14kW"],
+      [5600,6300,"덕트형(저정압)",900,"R-410A",15.88,9.52,0.04,"1/220/60","삼성 DVM S 덕트 5.6kW"],
+      [8000,9000,"덕트형(고정압)",1200,"R-410A",15.88,9.52,0.075,"1/220/60","삼성 DVM S 덕트 8kW"],
+      [5600,6300,"벽걸이형",780,"R-410A",12.7,6.35,0.03,"1/220/60","삼성 DVM S 벽걸이 5.6kW"],
+      [2800,3200,"4WAY 천장 카세트형",600,"R-410A",12.7,6.35,0.02,"1/220/60","LG 휘센 싱글 4Way 2.8kW"],
+      [4000,4500,"4WAY 천장 카세트형",840,"R-410A",15.88,9.52,0.03,"1/220/60","LG 휘센 싱글 4Way 4.0kW"],
+      [5600,6300,"4WAY 천장 카세트형",1200,"R-410A",15.88,9.52,0.04,"1/220/60","LG 휘센 싱글 4Way 5.6kW"],
+      [7100,8000,"4WAY 천장 카세트형",1620,"R-410A",15.88,9.52,0.055,"1/220/60","LG 휘센 싱글 4Way 7.1kW"],
+      [2800,3200,"2WAY 천장 카세트형",540,"R-410A",12.7,6.35,0.02,"1/220/60","LG 휘센 싱글 2Way 2.8kW"],
+      [5600,6300,"2WAY 천장 카세트형",1080,"R-410A",15.88,9.52,0.04,"1/220/60","LG 휘센 싱글 2Way 5.6kW"],
+      [4000,4500,"1WAY 천장 카세트형",720,"R-410A",15.88,9.52,0.03,"1/220/60","LG 휘센 싱글 1Way 4.0kW"],
+      [5600,6300,"스탠드형(상업용)",1260,"R-410A",15.88,9.52,0.04,"1/220/60","LG 휘센 싱글 스탠드 5.6kW"],
+      [7100,8000,"스탠드형(상업용)",1620,"R-410A",15.88,9.52,0.055,"1/220/60","LG 휘센 싱글 스탠드 7.1kW"],
+      [5600,6300,"천장매립덕트형",900,"R-410A",15.88,9.52,0.04,"1/220/60","LG 휘센 싱글 덕트 5.6kW"],
+      [7100,8000,"천장매립덕트형",1200,"R-410A",15.88,9.52,0.055,"1/220/60","LG 휘센 싱글 덕트 7.1kW"],
     ]
   },
 
@@ -498,10 +558,14 @@ const DB = {
   EHP_OUT: {
     name: "냉난방 히트펌프 실외기 (EHP OUTDOOR UNIT)",
     cols: [
-      "냉방용량(W)","난방용량(W)",
-      "압축기_형식","압축기_모터(kW)",
-      "응축기_형식","응축기_풍량(CMH)","응축기_모터(kW)",
-      "냉매","동력*(kW)","전원(Ph/V/Hz)","비고"
+      { label: "냉방용량(W)" },
+      { label: "난방용량(W)" },
+      { label: "압축기", children: ["형식", "모터(kW)"] },
+      { label: "응축기", children: ["형식", "팬용량(CMH)", "모터(kW)"] },
+      { label: "냉매" },
+      { label: "동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
       [25400,28600,"인버터 스크롤",0.55,"프로펠러",10800,"2.0/10.6","R-410A",null,"3/460/60",""],
@@ -511,19 +575,37 @@ const DB = {
       [34800,39200,"Inverter Scroll",5.3,"프로펠러",14400,1.2,"R-410A",14.3,"3/460/60",""],
       [23300,25900,"Inverter Scroll",5.3,"프로펠러",14400,1.2,"R-410A",10.6,"3/460/60",""],
       [2300,2800,"Twin Rotary",1.5,"프로펠러",1680,0.043,"R-410A",1.6,"1/220/60",""],
+      [8000,9000,"인버터 스크롤",null,"프로펠러",2880,null,"R-410A",null,"3/380/60","삼성 DVM S Eco 8kW"],
+      [10000,11200,"인버터 스크롤",null,"프로펠러",2880,null,"R-410A",null,"3/380/60","삼성 DVM S Eco 10kW"],
+      [14000,15800,"인버터 스크롤",null,"프로펠러",4320,null,"R-410A",null,"3/380/60","삼성 DVM S Eco 14kW"],
+      [16000,18000,"인버터 스크롤",null,"프로펠러",4320,null,"R-410A",null,"3/380/60","삼성 DVM S Eco 16kW"],
+      [22000,25000,"인버터 스크롤",null,"프로펠러",5760,null,"R-410A",null,"3/380/60","삼성 DVM S Eco Renewal 22kW"],
+      [2800,3200,"Twin Rotary",null,"프로펠러",1680,null,"R-410A",null,"1/220/60","LG 휘센 싱글 실외기 2.8kW"],
+      [4000,4500,"Twin Rotary",null,"프로펠러",2100,null,"R-410A",null,"1/220/60","LG 휘센 싱글 실외기 4.0kW"],
+      [5600,6300,"인버터 Scroll",null,"프로펠러",2880,null,"R-410A",null,"3/220/60","LG 휘센 싱글 실외기 5.6kW"],
+      [7100,8000,"인버터 Scroll",null,"프로펠러",3600,null,"R-410A",null,"3/220/60","LG 휘센 싱글 실외기 7.1kW"],
     ]
   },
 
   // ── DOAS / AHU ──
-  DOAS: { name:"외기전담공조기 (DOAS)", cols:["풍량(CMH)","냉방용량(kW)","난방용량(kW)","정압(Pa)","팬모터(kW)","냉매","전원(Ph/V/Hz)","비고"], data:[] },
-  AHU:  { name:"공조기 (AHU)",         cols:["풍량(CMH)","냉방용량(kW)","난방용량(kW)","정압(Pa)","팬모터(kW)","전원(Ph/V/Hz)","비고"], data:[] },
+  DOAS: { name:"외기전담공조기 (DOAS)", cols:[
+    {label:"풍량(CMH)"},{label:"냉방용량(kW)"},{label:"난방용량(kW)"},
+    {label:"정압(Pa)"},{label:"팬모터(kW)"},{label:"냉매"},{label:"전원(Ph/V/Hz)"},{label:"비고"}
+  ], data:[] },
+  AHU:  { name:"공조기 (AHU)", cols:[
+    {label:"풍량(CMH)"},{label:"냉방용량(kW)"},{label:"난방용량(kW)"},
+    {label:"정압(Pa)"},{label:"팬모터(kW)"},{label:"전원(Ph/V/Hz)"},{label:"비고"}
+  ], data:[] },
 
   // ── 전열교환기 ──
   HEX: {
     name: "전열교환기 (HEAT EXCHANGE VENTILATION UNIT)",
     cols: [
-      "형식","풍량(CMH)","정압*(Pa)",
-      "모터_동력*(kW)","모터_전원(Ph/V/Hz)","비고"
+      { label: "형식" },
+      { label: "풍량(CMH)" },
+      { label: "정압*(Pa)" },
+      { label: "모터", children: ["동력*(kW)", "전원(Ph/V/Hz)"] },
+      { label: "비고" },
     ],
     data: [
       ["HEAT EXCHANGER",800,100,0.266,"1/220/60","ACTIVATED CARBON FILTER 추가"],
@@ -540,7 +622,14 @@ const DB = {
   // ── 인라인 덕트팬 ──
   FAN_INLINE: {
     name: "인라인 덕트팬 (DUCT IN-LINE FAN)",
-    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압*(Pa)","모터_동력*(kW)","모터_전원(Ph/V/Hz)","비고"],
+    cols: [
+      { label: "팬번호(Ø mm)" },
+      { label: "동력전달" },
+      { label: "풍량(CMH)" },
+      { label: "정압*(Pa)" },
+      { label: "모터", children: ["동력*(kW)", "전원(Ph/V/Hz)"] },
+      { label: "비고" },
+    ],
     data: [
       [650,"DIRECT or V-BELT",15900,200,3.75,"3/460/60","ACTIVATED CARBON FILTER 추가"],
       [400,"DIRECT or V-BELT",2900,300,0.75,"3/460/60","ACTIVATED CARBON FILTER 추가"],
@@ -563,7 +652,14 @@ const DB = {
   // ── 천정형 팬 ──
   FAN_CEILING: {
     name: "천정형 팬 (CEILING FAN)",
-    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압*(Pa)","모터_동력*(kW)","모터_전원(Ph/V/Hz)","비고"],
+    cols: [
+      { label: "팬번호(Ø mm)" },
+      { label: "동력전달" },
+      { label: "풍량(CMH)" },
+      { label: "정압*(Pa)" },
+      { label: "모터", children: ["동력*(kW)", "전원(Ph/V/Hz)"] },
+      { label: "비고" },
+    ],
     data: [
       [200,"DIRECT",600,160,0.07,"1/220/60",""],
       [200,"DIRECT",650,160,0.07,"1/220/60",""],
@@ -584,7 +680,14 @@ const DB = {
   // ── 벽부형 팬 ──
   FAN_WALL: {
     name: "벽부형 팬 (WALL FAN)",
-    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압*(Pa)","모터_동력*(kW)","모터_전원(Ph/V/Hz)","비고"],
+    cols: [
+      { label: "팬번호(Ø mm)" },
+      { label: "동력전달" },
+      { label: "풍량(CMH)" },
+      { label: "정압*(Pa)" },
+      { label: "모터", children: ["동력*(kW)", "전원(Ph/V/Hz)"] },
+      { label: "비고" },
+    ],
     data: [
       [300,"DIRECT",1400,30,0.062,"1/220/60",""],
       [400,"DIRECT",2200,30,0.093,"1/220/60",""],
@@ -635,7 +738,14 @@ const DB = {
   // ── 루프팬 ──
   FAN_ROOF: {
     name: "루프팬 (ROOF FAN)",
-    cols: ["팬번호(Ø mm)","동력전달","풍량(CMH)","정압*(Pa)","모터_동력*(kW)","모터_전원(Ph/V/Hz)","비고"],
+    cols: [
+      { label: "팬번호(Ø mm)" },
+      { label: "동력전달" },
+      { label: "풍량(CMH)" },
+      { label: "정압*(Pa)" },
+      { label: "모터", children: ["동력*(kW)", "전원(Ph/V/Hz)"] },
+      { label: "비고" },
+    ],
     data: [
       [900,"DIRECT or V-BELT",26000,150,2.24,"3/460/60","1~2층 증기 터빈실 ROOF"],
       [600,"DIRECT or V-BELT",6100,150,0.75,"3/460/60","바닥재 저장동 저장홀 ROOF"],
@@ -648,12 +758,15 @@ const DB = {
   UNIT_HEATER: {
     name: "유니트 히터 (UNIT HEATER)",
     cols: [
-      "형식",
-      "용량(W)","용량(kg/h)",
-      "증기압력(kg/cm²)",
-      "팬_풍량*(CMH)","팬_동력*(kW)",
-      "크기*(mm L×W×H)","재질",
-      "동력*(kW)","전원(Ph/V/Hz)","비고"
+      { label: "형식" },
+      { label: "용량", children: ["(W)", "(kg/h)"] },
+      { label: "증기압력(kg/cm²)" },
+      { label: "팬", children: ["풍량*(CMH)", "동력*(kW)"] },
+      { label: "크기*(mm L×W×H)" },
+      { label: "재질" },
+      { label: "동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
       ["ELEC., WALL MOUNTED",5000,null,null,880,0.062,"-×-×-",null,5.0,"3/380/60",""],
@@ -668,7 +781,7 @@ const DB = {
       ["STEAM, WALL MOUNTED",3200,10,0.13,530,0.065,"500×290×250","SGCC,RS D3500",null,"1/220/60","W/HAND & TEMPERATURE SWITCH"],
       ["STEAM, WALL MOUNTED",8700,15,0.13,1060,0.065,"500×400×250","SGCC,RS D3500",null,"1/220/60","W/HAND & TEMPERATURE SWITCH"],
       ["STEAM, WALL MOUNTED",3000,null,null,680,0.065,"500×290×250","SGCC,RS D3500",1.0,"1/220/60",""],
-      ["STEAM, WALL MOUNTED",4000,null,null,680,0.065,"500×290×250","SGCC,RS D3500",2.0,"2/460/60",""],
+      ["STEAM, WALL MOUNTED",4000,null,null,680,0.065,"500×290×250","SGCC,RS D3500",2.0,"3/460/60",""],
       ["ELEC., WALL MOUNTED",4000,null,null,680,0.065,"500×290×250",null,1.2,"1/220/60",""],
     ]
   },
@@ -677,11 +790,16 @@ const DB = {
   RADIATOR: {
     name: "라디에이터 (RADIATOR)",
     cols: [
-      "형식",
-      "용량(W)","용량(kcal/h)",
-      "증기압력(MPa)","유량(kg/h)",
-      "섹션수","크기*(mm×mm×mm)","재질",
-      "소비전력(kW)","전원(Ph/V/Hz)","비고"
+      { label: "형식" },
+      { label: "용량", children: ["(W)", "(kcal/h)"] },
+      { label: "증기압력(MPa)" },
+      { label: "유량(kg/h)" },
+      { label: "섹션수" },
+      { label: "크기*(mm)" },
+      { label: "재질" },
+      { label: "소비전력(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
       ["ELEC.",1500,1290,null,null,null,"-×-×-",null,1.5,"1/220/60",""],
@@ -696,11 +814,11 @@ const DB = {
       ["STEAM, FLOOR MOUNTED",1000,null,0.15,1.8,3,"180×500×600","ALUMINIUM",null,null,""],
       ["STEAM, FLOOR MOUNTED",2000,null,0.15,5.7,10,"610×650×600","ALUMINIUM",null,null,""],
       ["STEAM, FLOOR MOUNTED",1200,null,0.15,2.3,4,"250×500×600","ALUMINIUM",null,null,""],
-      ["ELEC., FLOOR MOUNTED",800,1.2,null,null,null,"300×165×600",null,1.2,"1/220/60",""],
-      ["ELEC., FLOOR MOUNTED",1000,1.2,null,null,null,"370×165×600",null,1.2,"1/220/60",""],
-      ["ELEC., FLOOR MOUNTED",900,1.2,null,null,null,"300×165×600",null,1.2,"1/220/60",""],
-      ["ELEC., FLOOR MOUNTED",1200,1.2,null,null,null,"410×165×600",null,1.2,"1/220/60",""],
-      ["ELEC., FLOOR MOUNTED",800,1.2,null,null,null,"300×165×600",null,1.2,"1/220/60",""],
+      ["ELEC., FLOOR MOUNTED",800,688,null,null,null,"300×165×600",null,0.8,"1/220/60",""],
+      ["ELEC., FLOOR MOUNTED",1000,860,null,null,null,"370×165×600",null,1.0,"1/220/60",""],
+      ["ELEC., FLOOR MOUNTED",900,774,null,null,null,"300×165×600",null,0.9,"1/220/60",""],
+      ["ELEC., FLOOR MOUNTED",1200,1032,null,null,null,"410×165×600",null,1.2,"1/220/60",""],
+      ["ELEC., FLOOR MOUNTED",800,688,null,null,null,"300×165×600",null,0.8,"1/220/60",""],
     ]
   },
 
@@ -708,10 +826,15 @@ const DB = {
   WATER_HEATER: {
     name: "전기 급탕가열기 (ELEC. WATER GENERATOR)",
     cols: [
-      "형식","용량(L/h)",
-      "연결관경_온수(A)","연결관경_급수(A)","연결관경_환수(A)",
-      "크기*(mm L×W×H)","재질","보온",
-      "동력*(kW)","전원(Ph/V/Hz)","비고"
+      { label: "형식" },
+      { label: "용량(L/h)" },
+      { label: "연결관경(mm)*", children: ["온수", "급수", "환수"] },
+      { label: "크기*(mm L×W×H)" },
+      { label: "재질" },
+      { label: "보온" },
+      { label: "동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "비고" },
     ],
     data: [
       ["전기식, 수직형",30,15,15,15,"-",null,null,2.5,"1/220/60","식당"],
@@ -726,20 +849,31 @@ const DB = {
       ["전기식, 수직형",15,15,15,15,"-",null,null,1.5,"1/220/60",""],
       ["ELEC., WALL MOUNTED",15,null,null,null,"370×370×370",null,null,1.5,"1/220/60",""],
       ["ELEC., WALL MOUNTED",15,null,null,null,"370×370×370",null,null,1.5,"1/220/60",""],
-      ["ELEC., WALL MOUNTED",50,null,null,null,"240×x×450",null,null,2.0,"1/220/60",""],
+      ["ELEC., WALL MOUNTED",50,null,null,null,"240×?×450",null,null,2.0,"1/220/60",""],
       ["ELEC., WALL MOUNTED",15,null,null,null,"370×320×370",null,null,1.5,"1/220/60",""],
       ["ELEC., WALL MOUNTED",20,null,null,null,"450×389×450",null,null,3.5,"1/220/60",""],
     ]
   },
 
   // ── 전기보일러 / 냉각탑 ──
-  BOILER:        { name:"전기보일러 (ELEC. BOILER)",  cols:["용량(kW)","용량(kcal/h)","형식","전원(Ph/V/Hz)","비고"], data:[] },
-  COOLING_TOWER: { name:"냉각탑 (COOLING TOWER)",     cols:["냉각용량(RT)","냉각수량(LPM)","팬동력(kW)","전원(Ph/V/Hz)","외형치수","비고"], data:[] },
+  BOILER:        { name:"전기보일러 (ELEC. BOILER)",  cols:[
+    {label:"용량(kW)"},{label:"용량(kcal/h)"},{label:"형식"},{label:"전원(Ph/V/Hz)"},{label:"비고"}
+  ], data:[] },
+  COOLING_TOWER: { name:"냉각탑 (COOLING TOWER)",     cols:[
+    {label:"냉각용량(RT)"},{label:"냉각수량(LPM)"},{label:"팬동력(kW)"},{label:"전원(Ph/V/Hz)"},{label:"외형치수"},{label:"비고"}
+  ], data:[] },
 
   // ── 물탱크 ──
   WATER_TANK: {
     name: "물탱크 (WATER STORAGE TANK)",
-    cols: ["형식","용량(m³)","크기*(mm 폭×높이×길이)","재질","보온","비고"],
+    cols: [
+      { label: "형식" },
+      { label: "용량(m³)" },
+      { label: "크기*(mm 폭×높이×길이)" },
+      { label: "재질" },
+      { label: "보온" },
+      { label: "비고" },
+    ],
     data: [
       ["SQUARE",9.0,"1500×2000×3000","STS 304","50t GLASS WOOL+COLOR SHEET JACKET",""],
       ["SQUARE",12,"2000×2000×3000","STS 304","50t GLASS WOOL+COLOR SHEET JACKET",""],
@@ -753,9 +887,13 @@ const DB = {
   PUMP: {
     name: "급수 펌프 (PUMP)",
     cols: [
-      "형식","유량(L/min)","양정(M)",
-      "동력*(kW)","전원(Ph/V/Hz)",
-      "제품효율_A(%)","제품효율_B(%)","비고"
+      { label: "형식" },
+      { label: "유량(L/min)" },
+      { label: "양정(M)" },
+      { label: "동력*(kW)" },
+      { label: "전원(Ph/V/Hz)" },
+      { label: "제품효율*", children: ["A효율(%)", "B효율(%)"] },
+      { label: "비고" },
     ],
     data: [
       ["BOOSTER (2PUMP)",40,50,"0.75×2","3/460/60",null,null,"W/INVERTER(전동효율60%), LCP 구비, KS인증제품"],
@@ -768,15 +906,22 @@ const DB = {
   // ── 팽창탱크 ──
   EXPANSION_TANK: {
     name: "팽창탱크 (EXPANSION TANK)",
-    cols: ["형식","용량(L/min)","크기*(mm 폭×높이×깊이)","MAX압력(kg/cm²)","MIN압력(kg/cm²)","접속구경(mm)","비고"],
+    cols: [
+      {label:"형식"},{label:"용량(L/min)"},{label:"크기*(mm 폭×높이×깊이)"},
+      {label:"MAX압력(kg/cm²)"},{label:"MIN압력(kg/cm²)"},{label:"접속구경(mm)"},{label:"비고"}
+    ],
     data: [
       ["밀폐식 팽창탱크",12,"280×360(H)×280",1.8,1.3,20,""],
     ]
   },
 
   // ── 소방펌프 ──
-  FIRE_PUMP_MOTOR:  { name:"소방펌프 모터구동 (FIRE PUMP-MOTOR)",  cols:["유량(LPM)","양정(M)","전동력(kW)","형식","전원(Ph/V/Hz)","비고"], data:[] },
-  FIRE_PUMP_ENGINE: { name:"소방펌프 엔진구동 (FIRE PUMP-ENGINE)", cols:["유량(LPM)","양정(M)","엔진출력(PS)","형식","비고"], data:[] },
+  FIRE_PUMP_MOTOR:  { name:"소방펌프 모터구동 (FIRE PUMP-MOTOR)",  cols:[
+    {label:"유량(LPM)"},{label:"양정(M)"},{label:"전동력(kW)"},{label:"형식"},{label:"전원(Ph/V/Hz)"},{label:"비고"}
+  ], data:[] },
+  FIRE_PUMP_ENGINE: { name:"소방펌프 엔진구동 (FIRE PUMP-ENGINE)", cols:[
+    {label:"유량(LPM)"},{label:"양정(M)"},{label:"엔진출력(PS)"},{label:"형식"},{label:"비고"}
+  ], data:[] },
 };
 
 const MENU = [
@@ -822,8 +967,7 @@ let curKey = null;
 let editIdx = null;
 let selections = {};      // { key: Set<number> }
 let selPanelOpen = true;
-let sortCol = null;       // column index (number) or null
-let sortDir = 1;          // 1 = ASC, -1 = DESC
+let sortKeys = [];        // [{ col: number, dir: 1|-1 }, ...]
 
 // ════════════════════════════════════════
 // SIDEBAR
@@ -848,7 +992,7 @@ let sortDir = 1;          // 1 = ASC, -1 = DESC
 
 function selectKey(key) {
   curKey = key;
-  sortCol = null; sortDir = 1;
+  sortKeys = [];
   document.querySelectorAll('.menu-item').forEach(b =>
     b.classList.toggle('active', b.dataset.key === key)
   );
@@ -857,9 +1001,30 @@ function selectKey(key) {
   render();
 }
 
-function clickSort(colIdx) {
-  if (sortCol === colIdx) sortDir *= -1;
-  else { sortCol = colIdx; sortDir = 1; }
+function clickSort(colIdx, event) {
+  const shift = event && event.shiftKey;
+  const existing = sortKeys.findIndex(k => k.col === colIdx);
+
+  if (shift) {
+    // Shift+클릭: 기존 정렬에 추가 / 토글 / 제거
+    if (existing >= 0) {
+      if (sortKeys[existing].dir === 1) {
+        sortKeys[existing] = { col: colIdx, dir: -1 };
+      } else {
+        sortKeys.splice(existing, 1);
+      }
+    } else {
+      sortKeys.push({ col: colIdx, dir: 1 });
+    }
+  } else {
+    // 일반 클릭: 같은 컬럼이면 ASC→DESC→해제, 다른 컬럼이면 초기화 후 새로 시작
+    if (existing >= 0 && sortKeys.length === 1) {
+      if (sortKeys[0].dir === 1) sortKeys = [{ col: colIdx, dir: -1 }];
+      else sortKeys = [];
+    } else {
+      sortKeys = [{ col: colIdx, dir: 1 }];
+    }
+  }
   render();
 }
 
@@ -873,6 +1038,88 @@ function closeSb() {
 }
 
 // ════════════════════════════════════════
+// COL HELPERS
+// ════════════════════════════════════════
+function flatCols(cols) {
+  const out = [];
+  cols.forEach(c => { c.children ? c.children.forEach(ch => out.push(ch)) : out.push(c.label); });
+  return out;
+}
+
+function flatColsFull(cols) {
+  const out = [];
+  cols.forEach(c => {
+    if (c.children) c.children.forEach(ch => out.push({ display: `${c.label} › ${ch}`, leaf: ch }));
+    else out.push({ display: c.label, leaf: c.label });
+  });
+  return out;
+}
+
+function buildThead(cols, skeys) {
+  function badge(li) {
+    const idx = skeys.findIndex(k => k.col === li);
+    if (idx < 0) return { cls: '', ic: '<span class="sort-icon">⇅</span>' };
+    const { dir } = skeys[idx];
+    const rank = skeys.length > 1 ? `<sup>${idx + 1}</sup>` : '';
+    const arrow = dir === 1 ? '▲' : '▼';
+    return {
+      cls: dir === 1 ? ' sort-asc' : ' sort-desc',
+      ic: `<span class="sort-icon">${arrow}${rank}</span>`,
+    };
+  }
+
+  const hasGrp = cols.some(c => c.children && c.children.length);
+  if (!hasGrp) {
+    let tr = '<tr><th class="ctr" style="width:36px">#</th><th class="ctr" style="width:40px">선정</th>';
+    let li = 0;
+    cols.forEach(c => {
+      const { cls, ic } = badge(li);
+      tr += `<th class="sortable${cls}" onclick="clickSort(${li},event)">${esc(c.label)}${ic}</th>`;
+      li++;
+    });
+    tr += '<th class="ctr" style="width:90px">액션</th></tr>';
+    return `<thead>${tr}</thead>`;
+  }
+  let r1 = '<tr><th class="ctr grp-leaf" rowspan="2" style="width:36px">#</th><th class="ctr grp-leaf" rowspan="2" style="width:40px">선정</th>';
+  let r2 = '<tr>';
+  let li = 0;
+  cols.forEach(c => {
+    if (c.children && c.children.length) {
+      r1 += `<th class="grp" colspan="${c.children.length}">${esc(c.label)}</th>`;
+      c.children.forEach(ch => {
+        const { cls, ic } = badge(li);
+        r2 += `<th class="sortable grp-leaf${cls}" onclick="clickSort(${li},event)">${esc(ch)}${ic}</th>`;
+        li++;
+      });
+    } else {
+      const { cls, ic } = badge(li);
+      r1 += `<th rowspan="2" class="sortable grp-leaf${cls}" onclick="clickSort(${li},event)">${esc(c.label)}${ic}</th>`;
+      li++;
+    }
+  });
+  r1 += '<th class="ctr grp-leaf" rowspan="2" style="width:90px">액션</th></tr>';
+  r2 += '</tr>';
+  return `<thead>${r1}${r2}</thead>`;
+}
+
+function buildTheadSimple(cols) {
+  const hasGrp = cols.some(c => c.children && c.children.length);
+  if (!hasGrp) {
+    return '<thead><tr>' + cols.map(c => `<th>${esc(c.label)}</th>`).join('') + '</tr></thead>';
+  }
+  let r1 = '<tr>', r2 = '<tr>';
+  cols.forEach(c => {
+    if (c.children && c.children.length) {
+      r1 += `<th class="grp" colspan="${c.children.length}">${esc(c.label)}</th>`;
+      c.children.forEach(ch => { r2 += `<th class="grp-leaf">${esc(ch)}</th>`; });
+    } else {
+      r1 += `<th class="grp-leaf" rowspan="2">${esc(c.label)}</th>`;
+    }
+  });
+  return `<thead>${r1}</tr>${r2}</tr></thead>`;
+}
+
+// ════════════════════════════════════════
 // RENDER
 // ════════════════════════════════════════
 function render() {
@@ -880,7 +1127,8 @@ function render() {
   const eq = DB[curKey];
   document.getElementById('header-title').textContent = eq.name;
 
-  const hasCap = eq.cols.includes('냉방용량(W)');
+  const flat = flatCols(eq.cols);
+  const hasCap = flat.includes('냉방용량(W)');
   document.getElementById('cap-lbl').style.opacity = hasCap ? '1' : '0.3';
   document.getElementById('cap-min').disabled = !hasCap;
 
@@ -903,21 +1151,13 @@ function render() {
   }
 
   const selSet = selections[curKey] || new Set();
-  const cols = eq.cols;
 
-  let html = `<div class="table-wrap"><table><thead><tr>
-    <th class="ctr" style="width:36px">#</th>
-    <th class="ctr" style="width:40px">선정</th>`;
-  cols.forEach((c, i) => {
-    const isSortCol = sortCol === i;
-    const cls = ['sortable', isSortCol ? (sortDir === 1 ? 'sort-asc' : 'sort-desc') : ''].join(' ');
-    const icon = isSortCol ? (sortDir === 1 ? '▲' : '▼') : '⇅';
-    html += `<th class="${cls}" onclick="clickSort(${i})">${esc(c)}<span class="sort-icon">${icon}</span></th>`;
-  });
-  html += `<th class="ctr" style="width:90px">액션</th></tr></thead><tbody>`;
+  let html = `<div class="table-wrap"><table>`;
+  html += buildThead(eq.cols, sortKeys);
+  html += '<tbody>';
 
   if (rows.length === 0) {
-    html += `<tr><td colspan="${cols.length + 3}" style="text-align:center;padding:28px;color:#aaa">
+    html += `<tr><td colspan="${flat.length + 3}" style="text-align:center;padding:28px;color:#aaa">
       검색 결과가 없습니다.
     </td></tr>`;
   } else {
@@ -953,9 +1193,10 @@ function render() {
 // ════════════════════════════════════════
 function getFiltered() {
   const eq = DB[curKey];
+  const flat = flatCols(eq.cols);
   const kw = document.getElementById('srch').value.trim().toLowerCase();
   const capMin = parseFloat(document.getElementById('cap-min').value) || null;
-  const capIdx = eq.cols.indexOf('냉방용량(W)');
+  const capIdx = flat.indexOf('냉방용량(W)');
 
   let result = eq.data.map((row, idx) => ({ row, idx })).filter(({ row }) => {
     if (kw) {
@@ -969,13 +1210,21 @@ function getFiltered() {
     return true;
   });
 
-  if (sortCol !== null) {
+  if (sortKeys.length > 0) {
     result.sort((a, b) => {
-      const av = a.row[sortCol], bv = b.row[sortCol];
-      if (av === null || av === undefined) return 1;
-      if (bv === null || bv === undefined) return -1;
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir;
-      return String(av).localeCompare(String(bv), 'ko') * sortDir;
+      for (const { col, dir } of sortKeys) {
+        const av = a.row[col], bv = b.row[col];
+        const aNil = av === null || av === undefined;
+        const bNil = bv === null || bv === undefined;
+        if (aNil && bNil) continue;
+        if (aNil) return 1;
+        if (bNil) return -1;
+        const cmp = (typeof av === 'number' && typeof bv === 'number')
+          ? av - bv
+          : String(av).localeCompare(String(bv), 'ko');
+        if (cmp !== 0) return cmp * dir;
+      }
+      return 0;
     });
   }
   return result;
@@ -1003,12 +1252,12 @@ function openEdit(idx) {
 }
 
 function buildForm(rowData) {
-  const cols = DB[curKey].cols;
-  let html = cols.map((col, i) => {
+  const fullCols = flatColsFull(DB[curKey].cols);
+  let html = fullCols.map((col, i) => {
     const v = rowData ? (rowData[i] != null ? rowData[i] : '') : '';
     return `<div class="form-row">
-      <label>${esc(col)}</label>
-      <input type="text" data-i="${i}" value="${esc(String(v))}" placeholder="${esc(col)}">
+      <label>${esc(col.display)}</label>
+      <input type="text" data-i="${i}" value="${esc(String(v))}" placeholder="${esc(col.leaf)}">
     </div>`;
   }).join('');
   html += `<p class="form-hint">※ 숫자만 입력 시 수치로 자동 인식 &nbsp;|&nbsp; 빈 칸 또는 "—" 입력 시 null 처리</p>`;
@@ -1087,9 +1336,9 @@ function renderSelPanel() {
     if (!idxSet || idxSet.size === 0) return;
     const eq = DB[key];
     html += `<div style="font-size:11px;font-weight:700;color:#c0392b;margin:6px 0 4px">${esc(eq.name)}</div>`;
-    html += `<div class="table-wrap"><table><thead><tr>`;
-    eq.cols.forEach(c => { html += `<th>${esc(c)}</th>`; });
-    html += `</tr></thead><tbody>`;
+    html += `<div class="table-wrap"><table>`;
+    html += buildTheadSimple(eq.cols);
+    html += '<tbody>';
     [...idxSet].sort((a,b)=>a-b).forEach(i => {
       const row = eq.data[i];
       if (!row) return;
