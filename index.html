@@ -643,63 +643,85 @@ const DB = {
 
   // ── EHP 실외기 ──
   EHP_OUT: {
-    name: "냉난방 히트펌프 실외기 (EHP OUTDOOR UNIT)",
+    name: "히트펌프 실외기 (EHP OUTDOOR UNIT)",
     cols: [
-      { label: "시리즈" },
-      { label: "모델명" },
-      { label: "마력(HP)" },
-      { label: "냉방(kW)" },
-      { label: "난방(kW)" },
-      { label: "저온난방 -15°C(kW)" },
-      { label: "최대연결(EA)" },
-      { label: "소비전력(kW)", children: ["냉방", "난방"] },
-      { label: "냉매" },
-      { label: "전원(Ph,V,Hz)" },
+      { label: "시리즈" },                                                    // 0
+      { label: "모델명" },                                                    // 1
+      { label: "마력(HP)" },                                                  // 2
+      { label: "성능(kW)", children: ["냉방","난방","저온난방(-15°C)"] },     // 3,4,5
+      { label: "최대연결(EA)" },                                              // 6
+      { label: "소비전력(kW)", children: ["냉방","난방","저온난방(-15°C)"] }, // 7,8,9
+      { label: "전원(Ph,V,Hz)" },                                             // 10
+      { label: "에너지소비효율등급" },                                         // 11
+      { label: "통합냉방효율(EER)" },                                         // 12
+      { label: "통합난방효율(COP)" },                                         // 13
+      { label: "압축기", children: ["형식","출력(kW)"] },                     // 14,15
+      { label: "송풍기", children: ["형식","출력(W)","풍량(CMM)","기외정압(mmAq)"] }, // 16,17,18,19
+      { label: "배관(mm)", children: ["액관","가스관"] },                     // 20,21
+      { label: "냉매" },                                                      // 22
+      { label: "제품치수WxHxD(mm)" },                                         // 23
+      { label: "제품중량(kg)" },                                              // 24
+      { label: "사용온도(°C)", children: ["냉방","난방"] },                   // 25,26
     ],
     data: [
       // DVM S2 프레스티지 (AM__AXVUHH1) - 단일 유닛 8~18HP
-      ["DVM S2 프레스티지","AM080AXVUHH1",8,23.3,26.5,22.6,9,5.60,6.10,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM100AXVUHH1",10,29.0,32.6,28.3,11,8.10,8.00,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM120AXVUHH1",12,34.8,39.2,31.2,14,10.60,10.80,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM140AXVUHH1",14,40.6,45.7,43.0,16,10.90,11.00,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM160AXVUHH1",16,46.4,52.2,45.0,18,14.70,13.70,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM180AXVUHH1",18,52.2,59.1,50.6,20,19.50,16.90,"R410A","3,4,380,60"],
+      ["DVM S2 프레스티지","AM080AXVUHH1",8,23.3,26.5,22.6,9,5.60,6.10,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM100AXVUHH1",10,29.0,32.6,28.3,11,8.10,8.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM120AXVUHH1",12,34.8,39.2,31.2,14,10.60,10.80,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM140AXVUHH1",14,40.6,45.7,43.0,16,10.90,11.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM160AXVUHH1",16,46.4,52.2,45.0,18,14.70,13.70,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM180AXVUHH1",18,52.2,59.1,50.6,20,19.50,16.90,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
       // DVM S2 프레스티지 - 조합형 유닛 32~40HP (SY)
-      ["DVM S2 프레스티지","AM320AXVUHH1SY",32,91.8,102.2,86.5,36,36.90,29.00,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM340AXVUHH1SY",34,97.6,108.7,98.3,39,37.20,29.20,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM360AXVUHH1SY",36,104.4,118.2,101.2,41,39.00,33.80,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM380AXVUHH1SY",38,109.2,122.1,105.9,43,45.80,35.10,"R410A","3,4,380,60"],
-      ["DVM S2 프레스티지","AM400AXVUHH1SY",40,114.0,126.0,110.6,45,52.60,36.40,"R410A","3,4,380,60"],
+      ["DVM S2 프레스티지","AM320AXVUHH1SY",32,91.8,102.2,86.5,36,36.90,29.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM340AXVUHH1SY",34,97.6,108.7,98.3,39,37.20,29.20,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM360AXVUHH1SY",36,104.4,118.2,101.2,41,39.00,33.80,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM380AXVUHH1SY",38,109.2,122.1,105.9,43,45.80,35.10,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프레스티지","AM400AXVUHH1SY",40,114.0,126.0,110.6,45,52.60,36.40,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
       // DVM S2 프라임 (AM__AXVHHH1) - 단일 유닛 8~18HP
-      ["DVM S2 프라임","AM080AXVHHH1",8,23.3,26.5,22.6,9,5.60,6.10,"R410A","3,4,380,60"],
-      ["DVM S2 프라임","AM100AXVHHH1",10,29.0,32.6,28.3,11,8.10,8.00,"R410A","3,4,380,60"],
-      ["DVM S2 프라임","AM120AXVHHH1",12,34.8,39.2,31.2,14,10.60,10.80,"R410A","3,4,380,60"],
-      ["DVM S2 프라임","AM140AXVHHH1",14,40.6,45.7,43.0,16,10.90,11.00,"R410A","3,4,380,60"],
-      ["DVM S2 프라임","AM160AXVHHH1",16,46.4,52.2,45.0,18,14.70,13.70,"R410A","3,4,380,60"],
-      ["DVM S2 프라임","AM180AXVHHH1",18,52.2,59.1,50.6,20,19.50,16.90,"R410A","3,4,380,60"],
+      ["DVM S2 프라임","AM080AXVHHH1",8,23.3,26.5,22.6,9,5.60,6.10,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프라임","AM100AXVHHH1",10,29.0,32.6,28.3,11,8.10,8.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프라임","AM120AXVHHH1",12,34.8,39.2,31.2,14,10.60,10.80,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프라임","AM140AXVHHH1",14,40.6,45.7,43.0,16,10.90,11.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프라임","AM160AXVHHH1",16,46.4,52.2,45.0,18,14.70,13.70,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 프라임","AM180AXVHHH1",18,52.2,59.1,50.6,20,19.50,16.90,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
       // DVM S2 고효율 한랭지형 (AM__AXVSHH1) - 단일 유닛 8~16HP
-      ["DVM S2 고효율 한랭지형","AM080AXVSHH1",8,23.3,26.5,27.8,9,5.60,6.10,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM100AXVSHH1",10,29.0,32.6,28.9,11,8.10,8.00,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM120AXVSHH1",12,34.8,39.2,31.0,14,10.60,10.80,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM140AXVSHH1",14,40.6,45.7,40.3,16,13.90,11.60,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM160AXVSHH1",16,46.4,52.2,45.6,18,14.70,13.70,"R410A","3,4,380,60"],
+      ["DVM S2 고효율 한랭지형","AM080AXVSHH1",8,23.3,26.5,27.8,9,5.60,6.10,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM100AXVSHH1",10,29.0,32.6,28.9,11,8.10,8.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM120AXVSHH1",12,34.8,39.2,31.0,14,10.60,10.80,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM140AXVSHH1",14,40.6,45.7,40.3,16,13.90,11.60,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM160AXVSHH1",16,46.4,52.2,45.6,18,14.70,13.70,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
       // DVM S2 고효율 한랭지형 - 조합형 유닛 28~36HP (SY)
-      ["DVM S2 고효율 한랭지형","AM280AXVSHH1SY",28,81.3,89.5,82.8,32,31.90,24.30,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM300AXVSHH1SY",30,87.0,95.6,83.9,34,34.40,26.20,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM320AXVSHH1SY",32,92.8,102.2,86.0,36,36.90,29.00,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM340AXVSHH1SY",34,96.5,106.6,93.2,39,39.60,30.80,"R410A","3,4,380,60"],
-      ["DVM S2 고효율 한랭지형","AM360AXVSHH1SY",36,104.4,115.2,100.6,41,41.00,31.90,"R410A","3,4,380,60"],
+      ["DVM S2 고효율 한랭지형","AM280AXVSHH1SY",28,81.3,89.5,82.8,32,31.90,24.30,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM300AXVSHH1SY",30,87.0,95.6,83.9,34,34.40,26.20,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM320AXVSHH1SY",32,92.8,102.2,86.0,36,36.90,29.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM340AXVSHH1SY",34,96.5,106.6,93.2,39,39.60,30.80,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 고효율 한랭지형","AM360AXVSHH1SY",36,104.4,115.2,100.6,41,41.00,31.90,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
       // DVM S2 표준형 (AM__AXVGHH1) - 단일 유닛 8~18HP
-      ["DVM S2 표준형","AM080AXVGHH1",8,23.3,26.5,22.0,9,6.40,6.60,"R410A","3,4,380,60"],
-      ["DVM S2 표준형","AM100AXVGHH1",10,29.0,32.6,25.0,11,9.10,8.80,"R410A","3,4,380,60"],
-      ["DVM S2 표준형","AM120AXVGHH1",12,34.8,39.2,29.0,14,12.80,13.30,"R410A","3,4,380,60"],
-      ["DVM S2 표준형","AM140AXVGHH1",14,40.6,45.7,35.0,16,16.40,14.00,"R410A","3,4,380,60"],
-      ["DVM S2 표준형","AM160AXVGHH1",16,46.4,52.2,40.0,18,19.20,15.10,"R410A","3,4,380,60"],
-      ["DVM S2 표준형","AM180AXVGHH1",18,52.2,59.1,45.0,20,22.60,18.10,"R410A","3,4,380,60"],
-      // DVM S Compact 중간형 (1상 220V) - 저온난방 데이터 없음
-      ["DVM S Compact 중간형","AM040BXMDBH1",null,11.0,12.4,null,null,2.64,2.84,"R410A","1,2,220,60"],
-      ["DVM S Compact 중간형","AM050TXMDBH1",null,14.5,16.3,null,null,3.80,3.61,"R410A","1,2,220,60"],
-      ["DVM S Compact 중간형","AM060TXMDBH1",null,16.0,18.0,null,null,4.49,4.14,"R410A","1,2,220,60"],
+      ["DVM S2 표준형","AM080AXVGHH1",8,23.3,26.5,22.0,9,6.40,6.60,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 표준형","AM100AXVGHH1",10,29.0,32.6,25.0,11,9.10,8.80,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 표준형","AM120AXVGHH1",12,34.8,39.2,29.0,14,12.80,13.30,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 표준형","AM140AXVGHH1",14,40.6,45.7,35.0,16,16.40,14.00,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 표준형","AM160AXVGHH1",16,46.4,52.2,40.0,18,19.20,15.10,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S2 표준형","AM180AXVGHH1",18,52.2,59.1,45.0,20,22.60,18.10,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      // DVM S Compact 중간형 (1상 220V)
+      ["DVM S Compact 중간형","AM040BXMDBH1",null,11.0,12.4,null,null,2.64,2.84,null,"1,2,220,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S Compact 중간형","AM050TXMDBH1",null,14.5,16.3,null,null,3.80,3.61,null,"1,2,220,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      ["DVM S Compact 중간형","AM060TXMDBH1",null,16.0,18.0,null,null,4.49,4.14,null,"1,2,220,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,null,null],
+      // DVM S2 냉방전용 (AM__AXVGHC1) - 단일 유닛 14~16HP
+      ["DVM S2 냉방전용","AM140AXVGHC1",14,39.2,null,null,16,9.70,null,null,"3,4,380,60",null,null,null,"SSC Scroll×1",6.67,"Propeller",201,null,null,null,null,"R410A","1,295×1,695×765",233,"-15~50",null],
+      ["DVM S2 냉방전용","AM160AXVGHC1",16,46.4,null,null,18,11.30,null,null,"3,4,380,60",null,null,null,"SSC Scroll×1",8.93,"Propeller",293,null,null,null,null,"R410A","1,295×1,695×765",233,"-15~50",null],
+      // DVM S2 냉방전용 - 조합형 18~26HP (SY)
+      ["DVM S2 냉방전용","AM180AXVGHC1SY",18,52.2,null,null,20,11.30,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM200AXVGHC1SY",20,58.0,null,null,23,13.45,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM220AXVGHC1SY",22,63.0,null,null,25,15.75,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM240AXVGHC1SY",24,69.6,null,null,27,17.58,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM260AXVGHC1SY",26,74.0,null,null,30,17.70,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      // DVM S2 냉방전용 - 조합형 38~46HP (SY)
+      ["DVM S2 냉방전용","AM380AXVGHC1SY",38,108.8,null,null,null,27.28,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM400AXVGHC1SY",40,116.0,null,null,null,26.90,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM420AXVGHC1SY",42,121.0,null,null,null,29.20,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM440AXVGHC1SY",44,127.6,null,null,50,31.03,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
+      ["DVM S2 냉방전용","AM460AXVGHC1SY",46,132.6,null,null,52,33.33,null,null,"3,4,380,60",null,null,null,null,null,null,null,null,null,null,null,"R410A",null,null,"-15~50",null],
     ]
   },
 
