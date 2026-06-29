@@ -378,54 +378,70 @@ thead th.grp-leaf.sort-desc { background: #3d2b1a; color: #ffcc99; }
 // ════════════════════════════════════════
 const DB = {
 
-  // ── CTH 항온항습기 (실내기+실외기 세트) ──
-  // 공냉식(AIR COOLED): 실외기 세트, 수냉식(WATER COOLED): 실외기 항목 null
-  CTH: {
-    name: "CTH 항온항습기 (실내기+실외기 세트)",
+  // ── CTH 항온항습기 수냉식 (WATER COOLED) ──
+  CTH_WATER: {
+    name: "CTH 항온항습기 수냉식 (WATER COOLED)",
     cols: [
-      { label: "실내기_형식" },
-      { label: "팬&모터", children: ["형식", "풍량(CMH)", "정압(mmAq)", "모터(kW)"] },
-      { label: "냉방코일", children: ["형식", "용량(W)"] },
-      { label: "난방코일", children: ["형식", "용량(W)"] },
-      { label: "가습기", children: ["형식", "용량(kg/h)"] },
+      { label: "모델" },
+      { label: "냉방능력(kW)" },
+      { label: "난방능력(kW)" },
+      { label: "외형치수(mm)", children: ["높이(H)", "폭(W)", "길이(L)"] },
+      { label: "송풍기", children: ["형식", "표준풍량(CMM)", "기외정압(mmAq)"] },
+      { label: "압축기", children: ["형식", "출력(kW)"] },
       { label: "냉매" },
-      { label: "연결관경(Ø mm)", children: ["가스관", "액관"] },
-      { label: "동력*(kW)" },
-      { label: "전원(Ph/V/Hz)" },
-      { label: "실외기_냉방용량(W)" },
-      { label: "실외기_난방용량(W)" },
-      { label: "실외기_압축기", children: ["형식", "모터(kW)"] },
-      { label: "실외기_응축기", children: ["형식", "팬용량(CMH)", "모터(kW)"] },
-      { label: "실외기_냉매" },
-      { label: "실외기_동력*(kW)" },
-      { label: "실외기_전원(Ph/V/Hz)" },
-      { label: "비고" },
+      { label: "전원" },
+      { label: "소비전력(kW)" },
     ],
-    // [실내기형식, 팬형식, 팬풍량, 팬정압, 팬모터, 냉방코일형식, 냉방코일용량(W), 난방코일형식, 난방코일용량(W), 가습기형식, 가습기용량(kg/h), 냉매, 가스관, 액관, 동력(kW), 전원, ou냉방용량(W), ou난방용량(W), ou압축기형식, ou압축기모터(kW), ou응축기형식, ou응축기팬용량(CMH), ou응축기모터(kW), ou냉매, ou동력(kW), ou전원, 비고]
+    // [모델, 냉방kW, 난방kW, H, W, L, 송풍기형식, 풍량CMM, 정압mmAq, 압축기형식, 출력kW, 냉매, 전원, 소비전력kW]
     data: [
-      // ── 공냉식 (AIR COOLED) R-410A ──
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"D.X",26900,"D.X",17000,"ELEC.",null,"R-410A",25.4,15.9,41.01,"3/460/60", 26900,17000,"SCROLL",6.75,"프로펠러",9600,"0.21×2","R-410A",41.01,"3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,"-",0.75,"D.X",23500,"D.X",6500,"ELEC.",null,"R-410A",25.4,15.9,41.01,"3/460/60", 23500,6500,"SCROLL",6.75,"프로펠러",9600,"0.21×2","R-410A",41.01,"3/460/60",""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.20,"D.X",14500,"D.X",15000,"ELEC.","4.0/3.0","R-410A",19.1,12.7,20.11,"3/460/60", 14500,null,"SCROLL",2.98,"프로펠러",5400,"0.09×2","R-410A",20.11,"3/460/60",""],
-      // ── 공냉식 (AIR COOLED) R-407C / R-22 ──
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"D.X",14500,"D.X",15000,"ELEC.",null,"R-407C",19.1,12.7,18.4,"3/460/60", null,null,null,null,null,null,null,null,null,null,""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,"-",0.20,"D.X",8100,"D.X",null,"ELEC.",null,"R-407C",15.9,9.5,13.8,"3/460/60", null,null,null,null,null,null,null,null,null,null,""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,"-",1.5,"D.X",24900,"ELEC.",3700,"ELEC.",8.0,"R-22",22.2,19.1,47.7,"3/460/60", null,null,null,null,null,null,null,null,null,null,""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,"-",2.2,"D.X",10800,"ELEC.",1300,"ELEC.",null,"R-22",22.2,19.1,64.0,"3/460/60", null,null,null,null,null,null,null,null,null,null,""],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,"-",0.40,"D.X",2500,"D.X",null,"ELEC.",null,"R-22",15.9,9.5,18.4,"3/460/60", null,null,null,null,null,null,null,null,null,null,""],
-      // ── 공냉식 범양 세트 ──
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",4080,8,0.75,"CROSS FIN COIL",21000,"ELEC.",null,"ELEC.",4,"R-22",22.2,15.9,null,"3/220·380·440/60", 21000,null,"SCROLL",5.04,"PROPELLER",9600,0.42,"R-22",null,"3/220·380·440/60","범양 SVU 80R / PVU 80M / RSU 80R"],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,11,0.75,"CROSS FIN COIL",29000,"ELEC.",null,"ELEC.",4,"R-22",22.2,15.9,null,"3/220·380·440/60", 29000,null,"SCROLL",6.75,"PROPELLER",9600,0.42,"R-22",null,"3/220·380·440/60","범양 SVU 100R / PVU 100M / RSU 100R"],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,0,1.5,"CROSS FIN COIL",41280,"ELEC.",null,"ELEC.",8,"R-22",25.4,19.1,null,"3/220·380·440/60", 41280,null,"SCROLL×2",10.08,"PROPELLER",14400,0.84,"R-22",null,"3/220·380·440/60","범양 SVU 150RP / PVU 150JP / RSU 80R×2"],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",8100,15,2.2,"CROSS FIN COIL",41280,"ELEC.",null,"ELEC.",8,"R-22",25.4,19.1,null,"3/220·380·440/60", 41280,null,"SCROLL×2",10.08,"PROPELLER",14400,0.84,"R-22",null,"3/220·380·440/60","범양 SVU 150RD / PVU 150JD / RSU 80R×2"],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",10800,0,2.2,"CROSS FIN COIL",58140,"ELEC.",null,"ELEC.",11,"R-22",25.4,19.1,null,"3/220·380·440/60", 58140,null,"SCROLL×2",13.5,"PROPELLER",19200,0.84,"R-22",null,"3/220·380·440/60","범양 SVU 200RP / PVU 200JP / RSU 100R×2"],
-      ["AIR COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",10800,10,3.75,"CROSS FIN COIL",58140,"ELEC.",null,"ELEC.",11,"R-22",25.4,19.1,null,"3/220·380·440/60", 58140,null,"SCROLL×2",13.5,"PROPELLER",19200,0.84,"R-22",null,"3/220·380·440/60","범양 SVU 200RD / PVU 200JD / RSU 100R×2"],
-      // ── 수냉식 (WATER COOLED) — 실외기 없음 ──
-      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,0,0.2,"CROSS FIN COIL",10000,"ELEC.",null,"ELEC.",2.4,"R-22",null,null,2.21,"3/220·380·440/60", null,null,null,null,null,null,null,null,null,null,"범양 UCU 30M4"],
-      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",1620,0,0.2,"CROSS FIN COIL",10000,"ELEC.",null,"ELEC.",2.4,"R-22",null,null,2.21,"3/220·380·440/60", null,null,null,null,null,null,null,null,null,null,"범양 UCU 30M7.8"],
-      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",2700,8,0.4,"CROSS FIN COIL",16000,"ELEC.",null,"ELEC.",3.6,"R-22",null,null,2.98,"3/220·380·440/60", null,null,null,null,null,null,null,null,null,null,"범양 UCU 50M"],
-      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",4080,8,0.75,"CROSS FIN COIL",26000,"ELEC.",null,"ELEC.",4.8,"R-22",null,null,5.04,"3/220·380·440/60", null,null,null,null,null,null,null,null,null,null,"범양 UCU 80M"],
-      ["WATER COOLED,FLOOR MOUNTED,SIROCCO","SIROCCO",5400,11,0.75,"CROSS FIN COIL",32000,"ELEC.",null,"ELEC.",7.2,"R-22",null,null,5.96,"3/220·380·440/60", null,null,null,null,null,null,null,null,null,null,"범양 UCU 100M"],
+      ["UCU 30T4",  10.0, 8.6,  1700, 750,  380, "SIROCCO", 27,  0,  "SCROLL",   2.21,  "R-22", "1Ø220V 60Hz",            13.12],
+      ["UCU 30T7,8",10.0, 8.6,  1700, 750,  380, "SIROCCO", 27,  0,  "SCROLL",   2.21,  "R-22", "3Ø220/380/440V 60Hz",    17.58],
+      ["UCU 50T",   16.0, 13.76,1850, 950,  510, "SIROCCO", 45,  0,  "SCROLL",   2.98,  "R-22", "3Ø220/380/440V 60Hz",    18.66],
+      ["UCU 80T",   26.0, 22.36,1850, 1170, 510, "SIROCCO", 68,  0,  "SCROLL",   5.04,  "R-22", "3Ø220/380/440V 60Hz",    31.04],
+      ["UCU 100T",  32.0, 27.52,2190, 1495, 720, "SIROCCO", 90,  8,  "SCROLL×2", 5.96,  "R-22", "3Ø220/380/440V 60Hz",    38.89],
+      ["UCU 150TP", 52.32,45.0, 2190, 1465, 720, "SIROCCO", 135, 0,  "SCROLL×2", 10.08, "R-22", "3Ø220/380/440V 60Hz",    52.02],
+      ["UCU 150TD", 52.32,45.0, 1870, 1465, 720, "SIROCCO", 135, 15, "SCROLL×2", 10.08, "R-22", "3Ø220/380/440V 60Hz",    52.84],
+      ["UCU 200TP", 62.12,56.0, 2190, 1813, 720, "SIROCCO", 180, 0,  "SCROLL×2", 13.5,  "R-22", "3Ø220/380/440V 60Hz",    66.68],
+      ["UCU 200TD", 62.12,56.0, 1870, 1813, 720, "SIROCCO", 180, 0,  "SCROLL×2", 13.5,  "R-22", "3Ø220/380/440V 60Hz",    68.42],
+    ]
+  },
+
+  // ── CTH 항온항습기 공냉식 (AIR COOLED) ──
+  CTH_AIR: {
+    name: "CTH 항온항습기 공냉식 (AIR COOLED)",
+    cols: [
+      { label: "실내기 모델" },
+      { label: "냉방능력(kW)" },
+      { label: "난방능력(kW)" },
+      { label: "실내기_외형치수(mm)", children: ["높이(H)", "폭(W)", "길이(L)"] },
+      { label: "실내기_송풍기", children: ["형식", "표준풍량(CMM)", "기외정압(mmAq)"] },
+      { label: "실내기_열교환기형식" },
+      { label: "냉매" },
+      { label: "실외기 모델" },
+      { label: "실외기_외형치수(mm)", children: ["높이(H)", "폭(W)", "길이(L)"] },
+      { label: "실외기_송풍기", children: ["형식", "표준풍량(CMM)", "기외정압(mmAq)"] },
+      { label: "실외기_압축기", children: ["형식", "출력(kW)"] },
+      { label: "실외기_열교환기형식" },
+      { label: "실외기_냉매" },
+      { label: "전원" },
+      { label: "소비전력(kW)" },
+    ],
+    // [실내기모델, 냉방kW, 난방kW, 실내기H, 실내기W, 실내기L, 실내기팬형식, 실내기풍량CMM, 실내기정압mmAq, 실내기열교환기, 냉매, 실외기모델, 실외기H, 실외기W, 실외기L, 실외기팬형식, 실외기풍량CMM, 실외기정압mmAq, 실외기압축기형식, 실외기압축기kW, 실외기열교환기, 실외기냉매, 전원, 소비전력kW]
+    data: [
+      // ── KPU/KRU 시리즈 (R-407C) ──
+      ["KPU-30HE", 8.1,  6.97, 1680,1105, 380, "SIROCCO",  27,  20, "CROSS FIN COIL","R-407C","KRU-30HE",1105, 820, 380,"ZOOM FAN",  60,  0, "SCROLL",   2.11,"CROSS FIN COIL","R-407C","3Ø380V 60Hz",  12.90],
+      ["KPU-50HE",14.5, 12.47, 1840, 950, 510, "SIROCCO",  45,   0, "CROSS FIN COIL","R-407C","KRU-50HE",1100,1064, 424,"ZOOM FAN",  90,  0, "SCROLL",   2.98,"CROSS FIN COIL","R-407C","3Ø380V 60Hz",  19.20],
+      ["KPU-80HE",21.0, 18.06, 1840,1170, 510, "SIROCCO",  68,   0, "CROSS FIN COIL","R-407C","KRU-80HE", 872,1350, 710,"PROPELLER",110,  0, "SCROLL",   5.04,"CROSS FIN COIL","R-407C","3Ø380V 60Hz",  31.00],
+      // ── SVU/PVU/RSU 시리즈 (R-22) ──
+      ["PVU 30T4",  8.1,  6.97, 1700, 750, 380, "SIROCCO", 27,   0, "CROSS FIN COIL","R-22",  "RSU 30T4", 1105, 820, 300,"ZOOM FAN",  60,  0, "SCROLL",   2.11,"CROSS FIN COIL","R-22",  "1Ø220V 60Hz",  13.67],
+      ["PVU 30T7,8",8.1,  6.97, 1700, 750, 380, "SIROCCO", 27,   0, "CROSS FIN COIL","R-22",  "RSU 30T7,8",1105,820, 300,"ZOOM FAN", 60,  0, "SCROLL",   2.11,"CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",13.57],
+      ["PVU 50T",  14.5, 12.47, 1850, 950, 510, "SIROCCO", 45,   0, "CROSS FIN COIL","R-22",  "RSU 50T",  1100,1064, 424,"ZOOM FAN",  90,  0, "SCROLL",   2.98,"CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",20.11],
+      ["PVU 80T",  21.0, 18.06, 1850,1170, 510, "SIROCCO", 68,   8, "CROSS FIN COIL","R-22",  "RSU 80T",   872,1350, 710,"PROPELLER",110,  0, "SCROLL",   5.04,"CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",32.23],
+      ["PVU 100T", 29.0, 24.94, 1850,1470, 510, "SIROCCO", 90,  11, "CROSS FIN COIL","R-22",  "RSU 100T", 1022,1350, 710,"PROPELLER",160,  0, "SCROLL",   6.75,"CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",41.01],
+      ["PVU 150TP",41.28,35.50, 2190,1465, 720, "SIROCCO",135,   0, "CROSS FIN COIL","R-22",  "RSU 80T×2", 872,1350, 710,"PROPELLER×4",220,0,"SCROLL×2", 10.08,"CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",57.24],
+      ["PVU 150TD",41.28,35.50, 1870,1465, 720, "SIROCCO",135,  15, "CROSS FIN COIL","R-22",  "RSU 80T×2", 872,1350, 710,"PROPELLER×4",220,0,"SCROLL×2", 10.08,"CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",58.06],
+      ["PVU 200TP",58.14,50.0,  2190,1813, 720, "SIROCCO",180,   0, "CROSS FIN COIL","R-22",  "RSU 100T×2",1022,1350,710,"PROPELLER×4",320,0,"SCROLL×2", 13.5, "CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",73.60],
+      ["PVU 200TD",58.14,50.0,  1870,1813, 720, "SIROCCO",180,  10, "CROSS FIN COIL","R-22",  "RSU 100T×2",1022,1350,710,"PROPELLER×4",320,0,"SCROLL×2", 13.5, "CROSS FIN COIL","R-22",  "3Ø220/380/440V 60Hz",75.34],
     ]
   },
 
@@ -1164,7 +1180,8 @@ const DB = {
 
 const MENU = [
   { group:"냉난방", items:[
-    {key:"CTH",     label:"CTH 항온항습기(실내기+실외기)"},
+    {key:"CTH_WATER", label:"CTH 항온항습기 수냉식"},
+    {key:"CTH_AIR",   label:"CTH 항온항습기 공냉식"},
     {key:"PAC",     label:"PAC 패키지에어컨 (냉난방)"},
     {key:"PAC_C",   label:"PAC 패키지에어컨 (냉방전용)"},
     {key:"SAC",     label:"SAC 스플릿에어컨"},
