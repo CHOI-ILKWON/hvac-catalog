@@ -1623,10 +1623,24 @@ function toggleSelPanel() {
 // ════════════════════════════════════════
 const LS_KEY = 'hvac_catalog_userdata';
 
+// 서버(index.html) 원본 데이터의 지문. 원본이 바뀐 분류는 브라우저 저장값을 버리고 새 원본을 보여준다.
+function dataHash(rows) {
+  const str = JSON.stringify(rows);
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return String(h);
+}
+const BASE_HASH = {};
+Object.keys(DB).forEach(k => { BASE_HASH[k] = dataHash(DB[k].data); });
+
 function lsSave() {
   try {
-    const out = {};
-    Object.keys(DB).forEach(k => { out[k] = DB[k].data; });
+    const out = { v: 2, base: {}, data: {} };
+    Object.keys(DB).forEach(k => {
+      if (dataHash(DB[k].data) === BASE_HASH[k]) return; // 원본 그대로면 저장 안 함
+      out.base[k] = BASE_HASH[k];
+      out.data[k] = DB[k].data;
+    });
     localStorage.setItem(LS_KEY, JSON.stringify(out));
   } catch(e) {}
 }
@@ -1636,8 +1650,9 @@ function lsLoad() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
-    Object.keys(saved).forEach(k => {
-      if (DB[k] && Array.isArray(saved[k])) DB[k].data = saved[k];
+    if (saved.v !== 2) { localStorage.removeItem(LS_KEY); return; } // 옛 형식: 원본 기준을 알 수 없어 폐기
+    Object.keys(saved.data || {}).forEach(k => {
+      if (DB[k] && Array.isArray(saved.data[k]) && saved.base[k] === BASE_HASH[k]) DB[k].data = saved.data[k];
     });
   } catch(e) {}
 }
